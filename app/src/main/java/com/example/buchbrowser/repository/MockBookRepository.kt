@@ -27,11 +27,11 @@ import kotlin.random.Random
 
 // liefert feste Beispieldaten für Tests und UI
 class MockBookRepository(
-    // auch hier bleibt Zufall austauschbar, falls man später gezielt testen will
+    // auch hier bleibt Zufall austauschbar für spätere Tests
     private val random: Random = Random.Default,
 ) : BookRepository {
 
-    // kleine feste Liste, damit Team und UI ohne echte API schon arbeiten können
+    // kleine feste Liste, damit Team und UI ohne echte API schon loslegen können
     private val sampleBooks = listOf(
         Book(
             id = "/works/OL45883W",
@@ -62,10 +62,10 @@ class MockBookRepository(
         ),
     )
 
-    // merkt sich nur die IDs, weil für den Gesehen Status mehr nicht nötig ist
+    // merkt sich nur IDs, für gesehen reicht das schon
     private val seenBookIds = linkedSetOf<String>()
 
-    // sucht nur in den Mockdaten und verhält sich nach außen wie das echte Repository
+    // sucht nur in den Mockdaten, fühlt sich nach außen aber wie das echte Repo an
     override suspend fun searchBooks(query: String): List<Book> {
         val normalizedQuery = query.trim().lowercase()
         if (normalizedQuery.isBlank()) {
@@ -80,7 +80,7 @@ class MockBookRepository(
 
             titleMatches || authorMatches
         }.map { book ->
-            // setzt den lokalen Gesehen Status direkt auf das Ergebnis, damit UI sofort passt
+            // setzt den lokalen Gesehen Status direkt auf den Treffer
             book.copy(isSeen = seenBookIds.contains(book.id))
         }
     }
@@ -96,7 +96,7 @@ class MockBookRepository(
     }
 
     override suspend fun getSeenBooks(): List<Book> {
-        // gibt nur die Bücher zurück, deren ID vorher lokal gemerkt wurde
+        // gibt nur Bücher zurück, deren ID vorher gemerkt wurde
         return sampleBooks.filter { book ->
             seenBookIds.contains(book.id)
         }.map { book ->
@@ -105,7 +105,7 @@ class MockBookRepository(
     }
 
     override suspend fun markBookAsSeen(book: Book) {
-        // set verhindert doppelte Einträge automatisch
+        // set blockt doppelte Einträge von selbst
         seenBookIds.add(book.id)
     }
 }

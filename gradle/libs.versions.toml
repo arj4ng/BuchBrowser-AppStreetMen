@@ -1,5 +1,5 @@
 [versions]
-# basis für Build und Android Plugin
+# Build Basis
 agp = "9.2.1"
 coreKtx = "1.10.1"
 junit = "4.13.2"
@@ -17,7 +17,7 @@ ksp = "2.2.10-2.0.2"
 coil = "2.7.0"
 
 [libraries]
-# basis libs für Android und Compose
+# Android und Compose Basis
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -33,24 +33,24 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 
-# bildladen für Buchcover
+# Cover laden
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
-# lokale Datenbank mit Room
+# Room
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
-# API Zugriff und Logging
+# API und Logging
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 
-# testhilfe für suspend Funktionen
+# Testhilfe für suspend Sachen
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
 
 [plugins]
-# plugin Sammlung für App, Compose und Codegenerierung
+# Plugins für App, Compose und Codegen
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

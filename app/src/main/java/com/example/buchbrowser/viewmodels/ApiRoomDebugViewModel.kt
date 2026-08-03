@@ -9,8 +9,8 @@ import com.example.buchbrowser.data.Book
 import com.example.buchbrowser.repository.BookRepository
 import kotlinx.coroutines.launch
 
-// app/src/main/java/com/example/buchbrowser/viewmodels/DataTestViewModel.kt
-// DataTestViewModel
+// app/src/main/java/com/example/buchbrowser/viewmodels/ApiRoomDebugViewModel.kt
+// ApiRoomDebugViewModel
 //
 // Created by Arjang Khademi on 03.08.2026
 /*
@@ -25,31 +25,31 @@ import kotlinx.coroutines.launch
 */
 
 // TODO: ╔══ [ BuchBrowser ] ══╗
-// TODO: ║DataTestViewModel.kt ║
+// TODO: ║ApiRoomDebugViewModel║
 // TODO: ╚═════════════════════╝
 
 // TODO: ┏━ PROJEKTWOCHE | DATENTEST
 // TODO: ┗━ Datenzugriff sichtbar machen
 
-class DataTestViewModel(
+class ApiRoomDebugViewModel(
     private val repository: BookRepository,
 ) : ViewModel() {
 
-    // hält alles zusammen, was der Testsceen gerade anzeigen soll
-    var uiState by mutableStateOf(DataTestUiState())
+    // hält alles, was der Screen gerade zeigen soll
+    var uiState by mutableStateOf(ApiRoomDebugUiState())
         private set
 
     init {
-        // beim Start holen wir direkt die lokal gemerkten Bücher rein
+        // beim Start holen wir direkt die lokal gemerkten Bücher
         loadSeenBooks()
     }
 
-    // aktualisiert nur den Suchtext
+    // ändert nur den Suchtext
     fun updateSearchQuery(searchQuery: String) {
         uiState = uiState.copy(searchQuery = searchQuery)
     }
 
-    // holt Suchergebnisse aus dem Repository
+    // holt Suchtreffer aus dem Repo
     fun searchBooks() {
         val query = uiState.searchQuery.trim()
         if (query.isBlank()) {
@@ -61,13 +61,13 @@ class DataTestViewModel(
         }
 
         viewModelScope.launch {
-            // loading hilft im Testscreen direkt zu sehen, dass gerade wirklich etwas passiert
+            // loading zeigt im Screen direkt, dass gerade was läuft
             uiState = uiState.copy(
                 isLoading = true,
                 statusText = "Lade Suchergebnisse...",
             )
 
-            // fehler landen absichtlich im Statusfeld, damit man im Testscreen sofort sieht was los ist
+            // Fehler landen extra im Statusfeld, damit man sofort sieht was schiefläuft
             runCatching {
                 repository.searchBooks(query)
             }.onSuccess { books ->
@@ -96,7 +96,7 @@ class DataTestViewModel(
                 repository.markBookAsSeen(book)
                 repository.getSeenBooks()
             }.onSuccess { seenBooks ->
-                // der Treffer oben wird direkt aktualisiert, damit Room und Suchliste gleich aussehen
+                // der Treffer oben wird direkt mitgezogen, damit unten und oben gleich aussehen
                 val updatedResults = uiState.searchResults.map { currentBook ->
                     if (currentBook.id == book.id) {
                         currentBook.copy(isSeen = true)
@@ -124,7 +124,7 @@ class DataTestViewModel(
             runCatching {
                 repository.getSeenBooks()
             }.onSuccess { books ->
-                // Room Daten landen separat im unteren Bereich der Testansicht
+                // Room Daten landen extra im unteren Bereich
                 uiState = uiState.copy(seenBooks = books)
             }.onFailure {
                 uiState = uiState.copy(
@@ -135,8 +135,8 @@ class DataTestViewModel(
     }
 }
 
-data class DataTestUiState(
-    // Startwert macht den Testsceen direkt benutzbar, ohne dass erst Text eingegeben werden muss
+data class ApiRoomDebugUiState(
+    // Startwert macht den Screen direkt nutzbar
     val searchQuery: String = "harry potter",
     val searchResults: List<Book> = emptyList(),
     val seenBooks: List<Book> = emptyList(),

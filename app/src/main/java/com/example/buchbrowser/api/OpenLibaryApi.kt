@@ -29,7 +29,7 @@ private const val COVER_URL_TEMPLATE = "https://covers.openlibrary.org/b/id/%s-M
 // TODO: ┏━ PROJEKTWOCHE | API
 // TODO: ┗━ Bücher bei OpenLibrary suchen
 
-// hier stehen die Anfragen, die wir an OpenLibrary schicken
+// hier stehen die Anfragen an OpenLibrary
 interface OpenLibraryApi {
 
     @GET("search.json")
@@ -39,13 +39,13 @@ interface OpenLibraryApi {
     ): OpenLibrarySearchResponse
 }
 
-// so kommt eine Buchsuche von der API zurück
+// so sieht eine Buchsuche von der API aus
 data class OpenLibrarySearchResponse(
     @SerializedName("docs")
     val docs: List<OpenLibraryBookDto>,
 )
 
-// rohdaten für ein einzelnes Buch aus der API
+// rohe Buchdaten aus der API
 data class OpenLibraryBookDto(
     @SerializedName("key")
     val key: String?,
@@ -61,13 +61,13 @@ data class OpenLibraryBookDto(
     val languageCodes: List<String>?,
 )
 
-// macht aus den API Rohdaten ein Buch, mit dem App direkt arbeiten kann
+// macht aus API Zeug unser normales Buchmodell
 fun OpenLibraryBookDto.toBook(isSeen: Boolean): Book {
     return Book(
         id = key.orEmpty(),
         title = title.orEmpty(),
         authorNames = authorNames.orEmpty(),
-        // OpenLibrary liefert nur die Cover ID, die fertige URL bauen wir hier selbst zusammen
+        // OpenLibrary gibt nur die Cover ID, die URL bauen wir selbst
         coverUrl = coverId?.let { value ->
             COVER_URL_TEMPLATE.format(value)
         },

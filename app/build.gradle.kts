@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    // ksp erzeugt den Room Code im Hintergrund beim Bauen
+    // ksp baut den Room Code beim Build mit
     alias(libs.plugins.ksp)
 }
 
@@ -40,7 +40,7 @@ android {
 }
 
 dependencies {
-    // compose Basis für unsere Oberfläche
+    // compose Grundzeug
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
@@ -50,32 +50,32 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
-    // coil lädt Buchcover direkt aus der URL in Compose
+    // coil lädt Cover aus der URL
     implementation(libs.coil.compose)
 
-    // room kümmert sich um lokale Daten und den passenden Kotlin Support
+    // room für lokale Daten
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
 
-    // retrofit plus okhttp übernehmen API Anfragen und Logging in Logcat
+    // API Anfragen plus Logging
     implementation(libs.okhttp.logging)
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.gson)
 
-    // der Room Compiler baut die Datenbankklassen automatisch beim Build
+    // Room Klassen kommen über den Compiler rein
     ksp(libs.androidx.room.compiler)
 
-    // Testbasis für normale Unit Tests und Coroutines
+    // normales Test Zeug
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
 
-    // Android und Compose Tests für spätere UI Prüfungen
+    // Android und Compose Tests
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
 
-    // Debug Tools für Preview und Compose Test Umgebung
+    // Debug Helfer für Preview und Tests
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

@@ -29,26 +29,26 @@ private const val BASE_URL = "https://openlibrary.org/"
 // TODO: ┏━ PROJEKTWOCHE | API
 // TODO: ┗━ Verbindung zur Buch API
 
-// stellt die Verbindung zur API her und schreibt Anfragen für Logcat mit
+// kümmert sich um API Verbindung und Logcat Mitschnitt
 object ApiClient {
 
-    // zeigt in Logcat genau, was bei der API Anfrage rausgeht und zurückkommt
+    // zeigt in Logcat, was rausgeht und wieder reinkommt
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
 
-    // hier hängt das Logging direkt am normalen Netzwerkclient dran
+    // hier hängt das Logging direkt am Client
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
         .build()
 
-    // retrofit nimmt uns den ganzen HTTP und JSON Aufwand im Hintergrund ab
+    // retrofit nimmt uns HTTP und JSON Arbeit ab
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    // daraus entsteht am Ende unsere nutzbare API Schnittstelle für OpenLibrary
+    // daraus kommt am Ende unsere OpenLibrary Schnittstelle
     val openLibraryApi: OpenLibraryApi = retrofit.create(OpenLibraryApi::class.java)
 }

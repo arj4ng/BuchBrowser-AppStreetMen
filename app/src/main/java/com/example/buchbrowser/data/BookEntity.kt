@@ -27,7 +27,7 @@ private const val LIST_SEPARATOR = " | "
 // TODO: ┏━ PROJEKTWOCHE | ROOM
 // TODO: ┗━ Gesehene Bücher speichern
 
-// room merkt sich hier bereits gesehene Bücher
+// room merkt sich hier gesehene Bücher
 @Entity(tableName = "seen_books")
 data class BookEntity(
     @PrimaryKey val id: String,
@@ -38,7 +38,7 @@ data class BookEntity(
     val languageCodesText: String,
 )
 
-// wandelt Roomdaten zurück ins Appmodell
+// macht aus Roomdaten wieder ein normales Buch
 fun BookEntity.toBook(): Book {
     return Book(
         id = id,
@@ -51,7 +51,7 @@ fun BookEntity.toBook(): Book {
     )
 }
 
-// macht aus Appdaten einen Room Eintrag
+// macht aus Buchdaten einen Room Eintrag
 fun Book.toEntity(): BookEntity {
     return BookEntity(
         id = id,
@@ -64,7 +64,7 @@ fun Book.toEntity(): BookEntity {
 }
 
 private fun List<String>.encodeList(): String {
-    // room speichert Listen hier erstmal simpel als einen Text
+    // room speichert Listen hier erstmal simpel als Text
     return joinToString(separator = LIST_SEPARATOR)
 }
 
@@ -73,7 +73,7 @@ private fun String.decodeList(): List<String> {
         return emptyList()
     }
 
-    // beim Lesen wird derselbe Trenner wieder sauber zurück in eine Liste gebaut
+    // beim Lesen geht derselbe Trenner wieder zurück in eine Liste
     return split(LIST_SEPARATOR).map { item ->
         item.trim()
     }

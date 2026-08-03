@@ -1,7 +1,7 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+// gemeinsames Build Zeug für alle Module
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.compose) apply false
-    // ksp braucht das Projekt oben schon, damit Room den Compiler im App Modul nutzen kann
+    // ksp muss hier schon rein, sonst fehlt Room später im App Modul
     alias(libs.plugins.ksp) apply false
 }

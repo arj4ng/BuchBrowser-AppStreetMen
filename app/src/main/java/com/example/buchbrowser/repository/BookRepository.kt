@@ -24,18 +24,18 @@ import com.example.buchbrowser.data.Book
 // TODO: ┏━ PROJEKTWOCHE | REPOSITORY
 // TODO: ┗━ Gemeinsame Datenschnittstelle
 
-// gemeinsame Schnittstelle für alle Buchdaten
+// gemeinsame Stelle für alle Buchdaten
 interface BookRepository {
 
-    // gibt Suchtreffer zurück, egal ob Daten später aus API oder Mock kommen
+    // gibt Suchtreffer zurück, egal ob API oder Mock
     suspend fun searchBooks(query: String): List<Book>
 
-    // liefert ein zufälliges Buch aus der gerade verfügbaren Datenquelle
+    // holt ein zufälliges Buch aus der aktuellen Quelle
     suspend fun getRandomBook(): Book?
 
-    // holt alle Bücher, die lokal schon als gesehen gespeichert wurden
+    // holt alle lokal gemerkten Bücher
     suspend fun getSeenBooks(): List<Book>
 
-    // merkt ein Buch lokal, damit der Status später wieder da ist
+    // merkt ein Buch lokal als gesehen
     suspend fun markBookAsSeen(book: Book)
 }

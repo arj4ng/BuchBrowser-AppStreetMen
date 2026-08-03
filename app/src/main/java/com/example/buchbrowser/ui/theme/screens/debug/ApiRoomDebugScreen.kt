@@ -1,4 +1,4 @@
-package com.example.buchbrowser.ui.theme.screens.datatest
+package com.example.buchbrowser.ui.theme.screens.debug
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,11 +34,11 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.buchbrowser.data.Book
 import com.example.buchbrowser.ui.theme.BuchBrowserTheme
-import com.example.buchbrowser.viewmodels.DataTestUiState
-import com.example.buchbrowser.viewmodels.DataTestViewModel
+import com.example.buchbrowser.viewmodels.ApiRoomDebugUiState
+import com.example.buchbrowser.viewmodels.ApiRoomDebugViewModel
 
-// app/src/main/java/com/example/buchbrowser/ui/theme/screens/datatest/DataTestView.kt
-// DataTestView
+// app/src/main/java/com/example/buchbrowser/ui/theme/screens/debug/ApiRoomDebugScreen.kt
+// ApiRoomDebugScreen
 //
 // Created by Arjang Khademi on 03.08.2026
 /*
@@ -53,19 +53,19 @@ import com.example.buchbrowser.viewmodels.DataTestViewModel
 */
 
 // TODO: ╔══ [ BuchBrowser ] ══╗
-// TODO: ║   DataTestView.kt   ║
+// TODO: ║ApiRoomDebugScreen.kt║
 // TODO: ╚═════════════════════╝
 
 // TODO: ┏━ PROJEKTWOCHE | DATENTEST
 // TODO: ┗━ Datenstatus im Screen prüfen
 
 @Composable
-fun DataTestView(
-    viewModel: DataTestViewModel,
+fun ApiRoomDebugScreen(
+    viewModel: ApiRoomDebugViewModel,
     innerPadding: PaddingValues,
 ) {
-    // hier wird nur der State aus dem ViewModel an die eigentliche Ansicht weitergereicht
-    DataTestViewContent(
+    // hier geht nur der State vom ViewModel weiter in die Ansicht
+    ApiRoomDebugContent(
         uiState = viewModel.uiState,
         innerPadding = innerPadding,
         onSearchQueryChange = viewModel::updateSearchQuery,
@@ -76,15 +76,15 @@ fun DataTestView(
 }
 
 @Composable
-fun DataTestViewContent(
-    uiState: DataTestUiState,
+fun ApiRoomDebugContent(
+    uiState: ApiRoomDebugUiState,
     innerPadding: PaddingValues,
     onSearchQueryChange: (String) -> Unit,
     onSearchClick: () -> Unit,
     onLoadSeenClick: () -> Unit,
     onMarkSeenClick: (Book) -> Unit,
 ) {
-    // die Testansicht zeigt bewusst API und Room Daten gleichzeitig untereinander
+    // der Screen zeigt API und Room Daten bewusst gleichzeitig
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -142,18 +142,18 @@ fun DataTestViewContent(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // LazyColumn macht die lange Datenansicht scrollbar, sobald mehr Treffer da sind
+        // LazyColumn macht die Liste scrollbar, sobald mehr Treffer da sind
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item {
-                DataSectionTitle(
+                DebugSectionTitle(
                     titleText = "API Suchergebnisse (${uiState.searchResults.size})",
                 )
             }
 
             items(uiState.searchResults, key = { book -> book.id }) { book ->
-                DataBookCard(
+                DebugBookCard(
                     book = book,
                     buttonText = if (book.isSeen) {
                         "Schon gesehen"
@@ -170,13 +170,13 @@ fun DataTestViewContent(
 
             item {
                 Spacer(modifier = Modifier.height(8.dp))
-                DataSectionTitle(
+                DebugSectionTitle(
                     titleText = "Room Gesehene Bücher (${uiState.seenBooks.size})",
                 )
             }
 
             items(uiState.seenBooks, key = { book -> "seen_${book.id}" }) { book ->
-                DataBookCard(
+                DebugBookCard(
                     book = book,
                     buttonText = "Gespeichert",
                     onActionClick = {},
@@ -188,10 +188,10 @@ fun DataTestViewContent(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun DataTestViewPreview() {
+private fun ApiRoomDebugScreenPreview() {
     var previewState by remember {
         mutableStateOf(
-            DataTestUiState(
+            ApiRoomDebugUiState(
                 searchQuery = "harry potter",
                 searchResults = listOf(
                     Book(
@@ -230,8 +230,8 @@ private fun DataTestViewPreview() {
     }
 
     BuchBrowserTheme {
-        // preview arbeitet mit lokalem Fake State, damit Buttons und Texte dort trotzdem reagieren
-        DataTestViewContent(
+        // preview läuft mit lokalem Fake State, damit dort trotzdem was reagiert
+        ApiRoomDebugContent(
             uiState = previewState,
             innerPadding = PaddingValues(0.dp),
             onSearchQueryChange = { newQuery ->
@@ -280,7 +280,7 @@ private fun DataTestViewPreview() {
 }
 
 @Composable
-private fun DataSectionTitle(titleText: String) {
+private fun DebugSectionTitle(titleText: String) {
     Text(
         text = titleText,
         style = MaterialTheme.typography.titleMedium,
@@ -289,12 +289,12 @@ private fun DataSectionTitle(titleText: String) {
 }
 
 @Composable
-private fun DataBookCard(
+private fun DebugBookCard(
     book: Book,
     buttonText: String,
     onActionClick: () -> Unit,
 ) {
-    // eine Karte zeigt immer Cover, Grunddaten und den aktuellen Gesehen Status zusammen
+    // eine Karte zeigt Cover, Grunddaten und den Gesehen Status zusammen
     Card(
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -333,7 +333,7 @@ private fun DataBookCard(
                         .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center,
                 ) {
-                    // ohne URL bleibt wenigstens ein klarer Platzhalter stehen
+                    // ohne URL bleibt einfach der Platzhalter stehen
                     Text(
                         text = "Kein\nCover",
                         style = MaterialTheme.typography.labelSmall,

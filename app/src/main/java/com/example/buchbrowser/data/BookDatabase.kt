@@ -27,7 +27,7 @@ import androidx.room.RoomDatabase
 // TODO: ┏━ PROJEKTWOCHE | ROOM
 // TODO: ┗━ Datenbank für Cache
 
-// zentrale Room Datenbank für lokale Buchdaten
+// zentrale Room Datenbank für lokale Buchsachen
 @Database(
     entities = [BookEntity::class],
     version = 1,
@@ -35,21 +35,21 @@ import androidx.room.RoomDatabase
 )
 abstract class BookDatabase : RoomDatabase() {
 
-    // hier holt sich der Rest der App den Zugriff auf unsere Buch Abfragen
+    // von hier kommt das DAO für alle Buch Abfragen
     abstract fun bookDao(): BookDao
 
     companion object {
         @Volatile
         private var instance: BookDatabase? = null
 
-        // sorgt dafür, dass die Datenbank nur einmal gebaut und danach wiederverwendet wird
+        // baut die DB nur einmal und nutzt sie danach weiter
         fun getInstance(context: Context): BookDatabase {
             return instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
-                    // applicationContext verhindert, dass aus Versehen ein Activity Context hängen bleibt
+                    // nimmt absichtlich den app Context, nicht den von einer Activity
                     context.applicationContext,
                     BookDatabase::class.java,
-                    // fester Name = dieselbe lokale Datenbank bei jedem App Start
+                    // fester Name, damit immer dieselbe lokale DB genutzt wird
                     "buch_browser_database",
                 ).build().also { database ->
                     instance = database

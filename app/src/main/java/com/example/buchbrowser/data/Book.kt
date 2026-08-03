@@ -22,7 +22,7 @@ package com.example.buchbrowser.data
 // TODO: ┏━ PROJEKTWOCHE | DATENMODELL
 // TODO: ┗━ Gemeinsames Buchmodell
 
-// gemeinsames Buchmodell für App und Datenquellen
+// Buchmodell für alles außenrum
 data class Book(
     val id: String,
     val title: String,
