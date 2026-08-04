@@ -1,4 +1,9 @@
 package com.example.buchbrowser.ui.theme.screens.settings
 
-class SettingsScreen {
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+
+@Composable
+fun SettingsScreen() {
+    Text(text = "Einstellungen")
 }

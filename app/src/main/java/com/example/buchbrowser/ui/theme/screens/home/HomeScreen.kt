@@ -1,4 +1,9 @@
 package com.example.buchbrowser.ui.theme.screens.home
 
-class HomeScreen {
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+
+@Composable
+fun HomeScreen() {
+    Text("Hier kommt der HomeScreen hin.")
 }
