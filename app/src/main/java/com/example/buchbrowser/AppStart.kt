@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -17,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -25,15 +23,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import com.example.buchbrowser.api.ApiClient
 import com.example.buchbrowser.data.Book
 import com.example.buchbrowser.data.BookDatabase
 import com.example.buchbrowser.navigation.Route
 import com.example.buchbrowser.repository.BookRepositoryImpl
 import com.example.buchbrowser.ui.theme.components.BookCard
-import com.example.buchbrowser.ui.theme.screens.details.BookDetailsScreen
 import com.example.buchbrowser.viewmodels.BookDetailsViewModel
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Settings
+import androidx.navigation.NavController
+import androidx.navigation.toRoute
+import com.example.buchbrowser.ui.theme.screens.details.BookDetailsScreen
+import com.example.buchbrowser.ui.theme.screens.home.HomeScreen
+import com.example.buchbrowser.ui.theme.screens.favorite.FavoriteScreen
+import com.example.buchbrowser.ui.theme.screens.settings.SettingsScreen
 
 // app/src/main/java/com/example/buchbrowser/AppStart.kt
 // AppStart
@@ -56,17 +60,7 @@ import com.example.buchbrowser.viewmodels.BookDetailsViewModel
 
 // TODO: ┏━ PROJEKTWOCHE | DETAILS
 // TODO: ┗━ Details Navigation einhängen
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.runtime.LaunchedEffect
-import androidx.navigation.NavController
-import com.example.buchbrowser.ui.theme.components.BookCard
-import com.example.buchbrowser.ui.theme.screens.home.HomeScreen
-import com.example.buchbrowser.ui.theme.screens.favorite.FavoriteScreen
-import com.example.buchbrowser.ui.theme.screens.settings.SettingsScreen
+
 
 @Composable
 fun AppStart() {
@@ -140,12 +134,36 @@ fun AppStart() {
             composable<Route.Settings> {
                 SettingsScreen()
             }
-            composable<Route.BookDetail> {
-                Text("Hier werden bald die BookDetail angezeigt.")
+            composable<Route.Details> { entry ->
+                val route = entry.toRoute<Route.Details>()
+
+                BookDetailsScreen(
+                    viewModel = detailsViewModel,
+                    book = Book(
+                        id = route.id,
+                        title = route.title,
+                        authorNames = listOf(route.author),
+                        coverUrl = route.coverUrl,
+                        firstPublishYear = route.firstPublishYear,
+                        languageCodes = emptyList(),
+                        isSeen = false,
+                    ),
+                    innerPadding = PaddingValues(),
+                    onBackClick = { navController.popBackStack() },
+                )
             }
+
+
+
+
+
+
+
+
         }
     }
 }
+
 
 @Composable
 private fun HomeRouteContent(

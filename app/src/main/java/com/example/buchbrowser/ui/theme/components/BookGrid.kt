@@ -3,6 +3,7 @@ package com.example.buchbrowser.ui.theme.components
 import android.app.ProgressDialog.show
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -28,10 +29,14 @@ fun BookGrid(
     ) {
         items(books) { book ->
             BookCard(
-                title = book.title,
-                author = book.authorNames.joinToString(", "),
-                coverUrl = book.coverUrl ?: "",
-                modifier = Modifier
+                book = book,
+                modifier = Modifier,
+                onClick = {
+                    onBookClick(book)
+                },
+                onDoubleClick = {
+                    //später dafür da um das Buch zu drehen
+                }
             )
         }
     }

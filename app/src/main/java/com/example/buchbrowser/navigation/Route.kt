@@ -21,5 +21,12 @@ sealed interface Route {
     data object Settings : Route
 
     @Serializable
-    data class BookDetail(val id: String) : Route
+    data class Details(
+        val id: String,
+        val title: String,
+        val author: String,
+        val coverUrl: String?,
+        val firstPublishYear: Int?,
+    ) : Route
 }
+
