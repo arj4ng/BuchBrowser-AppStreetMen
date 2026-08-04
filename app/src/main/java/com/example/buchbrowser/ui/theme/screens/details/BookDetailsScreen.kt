@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -61,6 +66,7 @@ fun BookDetailsScreen(
     viewModel: BookDetailsViewModel,
     book: Book,
     innerPadding: PaddingValues,
+    onBackClick: () -> Unit
 ) {
     // beim Öffnen landet erst das Buch im State, dann wird die Beschreibung gezogen
     LaunchedEffect(book.id) {
@@ -70,6 +76,7 @@ fun BookDetailsScreen(
     BookDetailsContent(
         uiState = viewModel.uiState,
         innerPadding = innerPadding,
+        onBackClick = onBackClick
     )
 }
 
@@ -77,6 +84,7 @@ fun BookDetailsScreen(
 fun BookDetailsContent(
     uiState: BookDetailsUiState,
     innerPadding: PaddingValues,
+    onBackClick: () -> Unit
 ) {
     val book = uiState.book ?: return
 
@@ -90,11 +98,26 @@ fun BookDetailsContent(
             .padding(horizontal = 24.dp, vertical = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onBackClick
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Zurück"
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
         BookHeroCover(
             title = book.title,
             coverUrl = book.coverUrl,
         )
-
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
@@ -244,6 +267,7 @@ private fun BookDetailsScreenPreview() {
                 description = "Bilbo stolpert in ein Abenteuer, das erst klein anfängt und dann immer größer wird. Genau daraus zieht der Screen seinen ruhigen, buchigen Mittelpunkt.",
             ),
             innerPadding = PaddingValues(0.dp),
+            onBackClick = TODO(),
         )
     }
 }

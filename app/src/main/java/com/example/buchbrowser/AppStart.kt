@@ -166,6 +166,7 @@ fun AppStart() {
                         isSeen = false,
                     ),
                     innerPadding = PaddingValues(),
+                    onBackClick = { navController.popBackStack() },
                 )
             }
         }
@@ -179,13 +180,14 @@ private fun HomeRouteContent(
     onBookClick: (Book) -> Unit,
 ) {
     BookCard(
-        title = book.title,
-        author = book.authorNames.joinToString().ifBlank { "Autor unbekannt" },
-        coverUrl = book.coverUrl ?: "",
+        book = book,
         modifier = Modifier.padding(innerPadding),
         onClick = {
             onBookClick(book)
         },
+        onDoubleClick = {
+            //später dafür da um das Buch zu drehen
+        }
     )
 }
 

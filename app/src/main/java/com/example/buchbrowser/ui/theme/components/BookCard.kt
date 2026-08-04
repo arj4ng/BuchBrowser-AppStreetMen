@@ -20,14 +20,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import androidx.compose.runtime.Composable
-
+import com.example.buchbrowser.data.Book
+import androidx.compose.foundation.combinedClickable
 @Composable
 fun BookCard(
-    title: String,
-    author: String,
-    coverUrl: String,
+    book: Book,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
+    onDoubleClick: () -> Unit = {}
 ) {
 
     var selected by remember {
@@ -48,13 +48,27 @@ fun BookCard(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .clickable {
-                selected = !selected
-                onClick()
-            }
-    ) {
+
+            .combinedClickable(
+
+                onClick = {
+
+                    onClick()
+
+                },
+
+                onDoubleClick = {
+
+                    selected = !selected
+
+                    onDoubleClick()
+
+                }
+
+            )
+    ){
         Row(
-            modifier = Modifier.height(250.dp)
+            modifier = Modifier.height(230.dp)
         ) {
             Card(
                 elevation = CardDefaults.cardElevation(elevation.dp),
@@ -65,11 +79,11 @@ fun BookCard(
             ) {
                 Box {
                     AsyncImage(
-                        model = coverUrl,
-                        contentDescription = title,
+                        model = book.coverUrl,
+                        contentDescription = book.title,
                         modifier = Modifier
-                            .width(170.dp)
-                            .height(250.dp),
+                            .width(150.dp)
+                            .height(230.dp),
                         contentScale = ContentScale.Crop
                     )
                     Box(
@@ -82,17 +96,12 @@ fun BookCard(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
+            text = book.title,
+            style = MaterialTheme.typography.titleSmall,
             maxLines = 2
         )
 
-        Text(
-            text = author,
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray
-        )
     }
 }
