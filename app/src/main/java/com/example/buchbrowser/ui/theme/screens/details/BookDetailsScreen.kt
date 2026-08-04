@@ -38,6 +38,9 @@ import com.example.buchbrowser.data.Book
 import com.example.buchbrowser.ui.theme.BuchBrowserTheme
 import com.example.buchbrowser.viewmodels.BookDetailsUiState
 import com.example.buchbrowser.viewmodels.BookDetailsViewModel
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 // app/src/main/java/com/example/buchbrowser/ui/theme/screens/details/BookDetailsScreen.kt
 // BookDetailsScreen
@@ -76,7 +79,8 @@ fun BookDetailsScreen(
     BookDetailsContent(
         uiState = viewModel.uiState,
         innerPadding = innerPadding,
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
+        onBookmarkClick = { viewModel.toggleBookmark() }
     )
 }
 
@@ -84,7 +88,8 @@ fun BookDetailsScreen(
 fun BookDetailsContent(
     uiState: BookDetailsUiState,
     innerPadding: PaddingValues,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onBookmarkClick: () -> Unit
 ) {
     val book = uiState.book ?: return
 
@@ -100,7 +105,8 @@ fun BookDetailsContent(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             IconButton(
                 onClick = onBackClick
@@ -108,6 +114,15 @@ fun BookDetailsContent(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Zurück"
+                )
+            }
+            IconButton(
+                onClick = onBookmarkClick
+            ){
+                Icon(
+                    imageVector = if (uiState.book?.isSeen == true) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                    contentDescription = "Merken",
+                    tint = if (uiState.book?.isSeen == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -268,6 +283,7 @@ private fun BookDetailsScreenPreview() {
             ),
             innerPadding = PaddingValues(0.dp),
             onBackClick = TODO(),
+            onBookmarkClick = TODO()
         )
     }
 }
