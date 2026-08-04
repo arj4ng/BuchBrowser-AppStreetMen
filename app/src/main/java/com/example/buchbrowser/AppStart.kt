@@ -32,13 +32,23 @@ import com.example.buchbrowser.ui.theme.components.BookCard
 import com.example.buchbrowser.viewmodels.BookDetailsViewModel
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import com.example.buchbrowser.ui.theme.screens.details.BookDetailsScreen
 import com.example.buchbrowser.ui.theme.screens.home.HomeScreen
 import com.example.buchbrowser.ui.theme.screens.favorite.FavoriteScreen
 import com.example.buchbrowser.ui.theme.screens.settings.SettingsScreen
-
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import com.example.buchbrowser.ui.theme.screens.readingList.ReadingListScreen
+import com.example.buchbrowser.ui.theme.screens.readinglist.ReadingListScreen
 // app/src/main/java/com/example/buchbrowser/AppStart.kt
 // AppStart
 //
@@ -61,7 +71,7 @@ import com.example.buchbrowser.ui.theme.screens.settings.SettingsScreen
 // TODO: ┏━ PROJEKTWOCHE | DETAILS
 // TODO: ┗━ Details Navigation einhängen
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppStart() {
     val context = LocalContext.current
@@ -94,26 +104,65 @@ fun AppStart() {
             Log.d("AppNavigation", "Aktueller Screen geändert zu: ${destination.route}")
         }
     }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+
+    //dynamischen Title ermittlen
+    val title = when {
+        currentDestination?.hasRoute<Route.Home>() == true -> "BuchBrowser"
+        currentDestination?.hasRoute<Route.Favorite>() == true -> "Favoriten"
+        currentDestination?.hasRoute<Route.Settings>() == true -> "Einstellungen"
+        currentDestination?.hasRoute<Route.Details>() == true -> "Details"
+        currentDestination?.hasRoute<Route.ReadingList>() == true -> "Leseliste"
+        else -> "BuchBrowser"
+    }
+
+    //Prüfen ob wir einen Zurück-Button brauchen
+    val canNavigateBack = navController.previousBackStackEntry != null &&
+            currentDestination?.hasRoute<Route.Home>() == false &&
+            currentDestination?.hasRoute<Route.Favorite>() == false &&
+            currentDestination?.hasRoute<Route.Settings>() == false
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            TopAppBar(
+                title = { Text(title) },
+                scrollBehavior = scrollBehavior,
+                navigationIcon = {
+                    if (canNavigateBack) {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Zurück")
+                        }
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { navController.navigate(Route.Home) }) {
+                        Icon(imageVector = Icons.Default.Search, contentDescription = "Suche")
+                    }
+                    IconButton(onClick = { navController.navigate(Route.ReadingList) }) {
+                        Icon(imageVector = Icons.Default.List, contentDescription = "Leseliste")
+                    }
+                }
+            )
+        },
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(
                     selected = currentDestination?.hierarchy?.any { it.hasRoute<Route.Home>() } == true,
                     onClick = { navigateToTab(navController, targetRoute = Route.Home) },
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    icon = { Icon(imageVector = Icons.Default.Home, contentDescription = "Home") },
                     label = { Text("Home") }
                 )
                 NavigationBarItem(
                     selected = currentDestination?.hierarchy?.any { it.hasRoute<Route.Favorite>() } == true,
                     onClick = { navigateToTab(navController, targetRoute = Route.Favorite) },
-                    icon = { Icon(Icons.Default.Favorite, contentDescription = "Favoriten") },
+                    icon = { Icon(imageVector = Icons.Default.Favorite, contentDescription = "Favoriten") },
                     label = { Text("Favoriten") }
                 )
                 NavigationBarItem(
                     selected = currentDestination?.hierarchy?.any { it.hasRoute<Route.Settings>() } == true,
                     onClick = { navigateToTab(navController, targetRoute = Route.Settings) },
-                    icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+                    icon = { Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings") },
                     label = { Text("Settings") }
                 )
             }
@@ -167,6 +216,9 @@ fun AppStart() {
                     innerPadding = PaddingValues(),
                     onBackClick = { navController.popBackStack() },
                 )
+            }
+            composable<Route.ReadingList> {
+                ReadingListScreen()
             }
 
 
