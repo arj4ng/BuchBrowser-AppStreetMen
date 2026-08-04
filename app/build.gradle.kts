@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     // ksp baut den Room Code beim Build mit
     alias(libs.plugins.ksp)
+    //Navigation
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
@@ -78,4 +80,8 @@ dependencies {
     // Debug Helfer für Preview und Tests
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation("androidx.compose.material:material-icons-extended")
+    //Navigation
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization)
 }
