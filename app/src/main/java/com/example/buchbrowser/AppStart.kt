@@ -19,11 +19,16 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavController
 import com.example.buchbrowser.ui.theme.components.BookCard
+import com.example.buchbrowser.ui.theme.screens.home.HomeScreen
+import com.example.buchbrowser.ui.theme.screens.favorite.FavoriteScreen
+import com.example.buchbrowser.ui.theme.screens.settings.SettingsScreen
 
 /**
  * Der zentrale Einstiegspunkt für die Benutzeroberfläche und Navigation der App.
@@ -56,24 +61,20 @@ fun AppStart() {
                 NavigationBarItem(
                     selected = currentDestination?.hierarchy?.any { it.hasRoute<Route.Home>() } == true,
                     onClick = { navigateToTab(navController, targetRoute = Route.Home) },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Default.Home,
-                            contentDescription = "Home"
-                        )
-                    },
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
                     label = { Text("Home") }
                 )
                 NavigationBarItem(
-                    selected = currentDestination?.hierarchy?.any { it.hasRoute<Route.Search>() } == true,
-                    onClick = { navigateToTab(navController, targetRoute = Route.Search) },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Suche"
-                        )
-                    },
-                    label = { Text("Suche") }
+                    selected = currentDestination?.hierarchy?.any { it.hasRoute<Route.Favorite>() } == true,
+                    onClick = { navigateToTab(navController, targetRoute = Route.Favorite) },
+                    icon = { Icon(Icons.Default.Favorite, contentDescription = "Favoriten") },
+                    label = { Text("Favoriten") }
+                )
+                NavigationBarItem(
+                    selected = currentDestination?.hierarchy?.any { it.hasRoute<Route.Settings>() } == true,
+                    onClick = { navigateToTab(navController, targetRoute = Route.Settings) },
+                    icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+                    label = { Text("Settings") }
                 )
             }
         }
@@ -84,17 +85,19 @@ fun AppStart() {
             startDestination = Route.Home,
             modifier = Modifier.padding(innerPadding)
         ){
-            composable<Route.Home> { BookCard(
+            composable<Route.Home> {
+                HomeScreen()
+            }
 
-                title = "Zora Neale",
-
-                author = "Von ???",
-
-                coverUrl = "https://covers.openlibrary.org/b/id/8231856-M.jpg"
-
-            ) }
-
-            composable<Route.Search> { Text("Search Screen (Work in Progress)") }
+            composable<Route.Favorite> {
+                FavoriteScreen()
+            }
+            composable<Route.Settings> {
+                SettingsScreen()
+            }
+            composable<Route.BookDetail> {
+                Text("Hier werden bald die BookDetail angezeigt.")
+            }
         }
     }
 }
