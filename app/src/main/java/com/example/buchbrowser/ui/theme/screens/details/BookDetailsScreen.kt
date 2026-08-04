@@ -79,7 +79,8 @@ fun BookDetailsScreen(
     BookDetailsContent(
         uiState = viewModel.uiState,
         innerPadding = innerPadding,
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
+        onBookmarkClick = { viewModel.toggleBookmark() }
     )
 }
 
