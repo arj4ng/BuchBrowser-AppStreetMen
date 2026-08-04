@@ -12,16 +12,14 @@ import kotlinx.serialization.Serializable
  * @see Route.Search
  */
 sealed interface Route {
-    /**
-     * Startbildschirm der Anwendung.
-     * Zeigt die Hauptübersicht / das Dashboard an.
-     */
+
     @Serializable
     data object Home: Route
-    /**
-     * Suchbildschirm der Anwendung.
-     * Ermöglicht das Suchen und Filtern von Inhalten.
-     */
     @Serializable
-    data object Search: Route
+    data object Favorite : Route
+    @Serializable
+    data object Settings : Route
+
+    @Serializable
+    data class BookDetail(val id: String) : Route
 }
