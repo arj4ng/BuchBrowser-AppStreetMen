@@ -56,6 +56,17 @@ import com.example.buchbrowser.viewmodels.BookDetailsViewModel
 
 // TODO: ┏━ PROJEKTWOCHE | DETAILS
 // TODO: ┗━ Details Navigation einhängen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.LaunchedEffect
+import androidx.navigation.NavController
+import com.example.buchbrowser.ui.theme.components.BookCard
+import com.example.buchbrowser.ui.theme.screens.home.HomeScreen
+import com.example.buchbrowser.ui.theme.screens.favorite.FavoriteScreen
+import com.example.buchbrowser.ui.theme.screens.settings.SettingsScreen
 
 @Composable
 fun AppStart() {
@@ -92,82 +103,45 @@ fun AppStart() {
 
     Scaffold(
         bottomBar = {
-            val hideBottomBar = currentDestination?.hierarchy?.any { destination ->
-                destination.hasRoute<Route.Details>()
-            } == true
-
-            if (!hideBottomBar) {
-                NavigationBar {
-                    NavigationBarItem(
-                        selected = currentDestination?.hierarchy?.any { it.hasRoute<Route.Home>() } == true,
-                        onClick = { navigateToTab(navController, targetRoute = Route.Home) },
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.Home,
-                                contentDescription = "Home",
-                            )
-                        },
-                        label = { Text("Home") },
-                    )
-                    NavigationBarItem(
-                        selected = currentDestination?.hierarchy?.any { it.hasRoute<Route.Search>() } == true,
-                        onClick = { navigateToTab(navController, targetRoute = Route.Search) },
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "Suche",
-                            )
-                        },
-                        label = { Text("Suche") },
-                    )
-                }
+            NavigationBar {
+                NavigationBarItem(
+                    selected = currentDestination?.hierarchy?.any { it.hasRoute<Route.Home>() } == true,
+                    onClick = { navigateToTab(navController, targetRoute = Route.Home) },
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    label = { Text("Home") }
+                )
+                NavigationBarItem(
+                    selected = currentDestination?.hierarchy?.any { it.hasRoute<Route.Favorite>() } == true,
+                    onClick = { navigateToTab(navController, targetRoute = Route.Favorite) },
+                    icon = { Icon(Icons.Default.Favorite, contentDescription = "Favoriten") },
+                    label = { Text("Favoriten") }
+                )
+                NavigationBarItem(
+                    selected = currentDestination?.hierarchy?.any { it.hasRoute<Route.Settings>() } == true,
+                    onClick = { navigateToTab(navController, targetRoute = Route.Settings) },
+                    icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+                    label = { Text("Settings") }
+                )
             }
         },
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = Route.Home,
-            modifier = Modifier.padding(innerPadding),
-        ) {
+            modifier = Modifier.padding(innerPadding)
+        ){
             composable<Route.Home> {
-                HomeRouteContent(
-                    book = homePreviewBook,
-                    innerPadding = innerPadding,
-                    onBookClick = { selectedBook ->
-                        navController.navigate(
-                            Route.Details(
-                                id = selectedBook.id,
-                                title = selectedBook.title,
-                                author = selectedBook.authorNames.joinToString().ifBlank { "Autor unbekannt" },
-                                coverUrl = selectedBook.coverUrl,
-                                firstPublishYear = selectedBook.firstPublishYear,
-                            ),
-                        )
-                    },
-                )
+                HomeScreen()
             }
 
-            composable<Route.Search> {
-                Text("Search Screen (Work in Progress)")
+            composable<Route.Favorite> {
+                FavoriteScreen()
             }
-
-            composable<Route.Details> { entry ->
-                val route = entry.toRoute<Route.Details>()
-
-                BookDetailsScreen(
-                    viewModel = detailsViewModel,
-                    book = Book(
-                        id = route.id,
-                        title = route.title,
-                        authorNames = listOf(route.author),
-                        coverUrl = route.coverUrl,
-                        firstPublishYear = route.firstPublishYear,
-                        languageCodes = emptyList(),
-                        isSeen = false,
-                    ),
-                    innerPadding = PaddingValues(),
-                    onBackClick = { navController.popBackStack() },
-                )
+            composable<Route.Settings> {
+                SettingsScreen()
+            }
+            composable<Route.BookDetail> {
+                Text("Hier werden bald die BookDetail angezeigt.")
             }
         }
     }
