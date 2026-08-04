@@ -1,6 +1,7 @@
 package com.example.buchbrowser.repository
 
 import com.example.buchbrowser.api.OpenLibraryApi
+import com.example.buchbrowser.api.toDescription
 import com.example.buchbrowser.api.toBook
 import com.example.buchbrowser.data.Book
 import com.example.buchbrowser.data.BookDao
@@ -83,5 +84,15 @@ class BookRepositoryImpl(
     override suspend fun markBookAsSeen(book: Book) {
         // setzt den Status vor dem Speichern nochmal sauber auf gesehen
         bookDao.insertSeenBook(book.copy(isSeen = true).toEntity())
+    }
+
+    override suspend fun getBookDescription(bookId: String): String? {
+        // work ids kommen aus OpenLibrary oft mit führendem Slash, für den Endpoint reicht der Pfad ohne Slash
+        val normalizedWorkKey = bookId.trim().removePrefix("/")
+        if (normalizedWorkKey.isBlank()) {
+            return null
+        }
+
+        return api.getBookDetails(workKey = normalizedWorkKey).toDescription()
     }
 }

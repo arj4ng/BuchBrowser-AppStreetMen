@@ -38,4 +38,7 @@ interface BookRepository {
 
     // merkt ein Buch lokal als gesehen
     suspend fun markBookAsSeen(book: Book)
+
+    // holt die Beschreibung für ein Buch nach
+    suspend fun getBookDescription(bookId: String): String?
 }
