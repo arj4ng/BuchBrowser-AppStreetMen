@@ -17,10 +17,10 @@ import com.example.buchbrowser.ui.theme.BuchBrowserTheme
 fun BookGrid(
     books: List<Book>,
     modifier: Modifier = Modifier,
-    onBookClick: (Book) -> Unit
+    onBookClick: (Book) -> Unit //vorbereitung für die Detailansicht
 ){
     LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
+        columns = GridCells.Fixed(count = 2),
         contentPadding = PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement =  Arrangement.spacedBy(24.dp),
