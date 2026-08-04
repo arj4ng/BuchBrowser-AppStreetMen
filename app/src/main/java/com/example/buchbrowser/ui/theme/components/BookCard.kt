@@ -26,7 +26,8 @@ fun BookCard(
     title: String,
     author: String,
     coverUrl: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
 ) {
 
     var selected by remember {
@@ -49,6 +50,7 @@ fun BookCard(
         modifier = modifier
             .clickable {
                 selected = !selected
+                onClick()
             }
     ) {
         Row(
@@ -94,4 +96,3 @@ fun BookCard(
         )
     }
 }
-

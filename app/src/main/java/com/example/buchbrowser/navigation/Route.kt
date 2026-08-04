@@ -24,4 +24,17 @@ sealed interface Route {
      */
     @Serializable
     data object Search: Route
+
+    /**
+     * Detailscreen für ein einzelnes Buch.
+     * Trägt die Basisdaten direkt über Navigation mit.
+     */
+    @Serializable
+    data class Details(
+        val id: String,
+        val title: String,
+        val author: String,
+        val coverUrl: String?,
+        val firstPublishYear: Int?,
+    ) : Route
 }
