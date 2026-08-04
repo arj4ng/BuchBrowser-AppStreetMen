@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavController
+import com.example.buchbrowser.ui.theme.components.BookCard
 
 /**
  * Der zentrale Einstiegspunkt für die Benutzeroberfläche und Navigation der App.
@@ -83,7 +84,15 @@ fun AppStart() {
             startDestination = Route.Home,
             modifier = Modifier.padding(innerPadding)
         ){
-            composable<Route.Home> { Text("Home Screen (Work in Progress)") }
+            composable<Route.Home> { BookCard(
+
+                title = "Zora Neale",
+
+                author = "Von ???",
+
+                coverUrl = "https://covers.openlibrary.org/b/id/8231856-M.jpg"
+
+            ) }
 
             composable<Route.Search> { Text("Search Screen (Work in Progress)") }
         }
