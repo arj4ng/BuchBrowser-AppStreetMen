@@ -74,6 +74,21 @@ class BookDetailsViewModel(
             }
         }
     }
+
+    /**
+     * TODO Logik zum Speichern der Buchmarked-Status.
+     * uiState wird lokal aktualisiert damit sich das Icon sofort ändern kann
+     *
+     */
+    fun toggleBookmark() {
+        val currentBook = uiState.book ?: return
+        viewModelScope.launch {
+            repository.markBookAsSeen(currentBook)
+            uiState = uiState.copy(
+                book = currentBook.copy(isSeen = true)
+            )
+        }
+    }
 }
 
 data class BookDetailsUiState(
