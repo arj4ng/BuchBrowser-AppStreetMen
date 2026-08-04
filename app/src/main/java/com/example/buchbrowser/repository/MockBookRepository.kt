@@ -108,4 +108,13 @@ class MockBookRepository(
         // set blockt doppelte Einträge von selbst
         seenBookIds.add(book.id)
     }
+
+    override suspend fun getBookDescription(bookId: String): String? {
+        return when (bookId) {
+            "/works/OL45883W" -> "Bilbo stolpert eher zufällig in ein großes Abenteuer und wächst mit jedem Schritt über sich hinaus."
+            "/works/OL27448W" -> "Elizabeth Bennet gerät zwischen Stolz, Vorurteile und sehr feine gesellschaftliche Spitzen."
+            "/works/OL82563W" -> "Momo hört zu wie kaum jemand sonst und stellt sich einer Welt entgegen, die Zeit nur noch sparen will."
+            else -> null
+        }
+    }
 }
