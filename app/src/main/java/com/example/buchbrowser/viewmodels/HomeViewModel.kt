@@ -41,11 +41,19 @@ class HomeViewModel(
         loadInitialBooks()
 
     }
+    fun loadOfflineBooks() {
+        viewModelScope.launch {
+            val result = MockBookRepository().searchBooks("")
+            allBooks = result
+            _books.value = result
+            _errorMessage.value = null
+        }
 
+    }
     private fun loadInitialBooks() {
         viewModelScope.launch {
             try {
-                val result = repository.searchBooks("tolkien")
+                val result = repository.searchBooks("a")
                 allBooks = result
                 _books.value = result
             } catch (e: Exception) {

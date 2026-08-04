@@ -11,6 +11,7 @@ import com.example.buchbrowser.ui.theme.components.BookGrid
 import com.example.buchbrowser.ui.theme.components.SearchBar
 import com.example.buchbrowser.viewmodels.HomeViewModel
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
@@ -39,14 +40,23 @@ fun HomeScreen(
             modifier = Modifier.padding(16.dp)
         )
 
-        errorMessage?.let { message ->
+        if (errorMessage != null) {
+
             Text(
-                text = message,
+                text = errorMessage!!,
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
-        }
 
+            Button(
+                onClick = {
+                    homeViewModel.loadOfflineBooks()
+                },
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text("Offline-Bibliothek anzeigen")
+            }
+        }
         if (books.isNotEmpty()) {
             BookGrid(
                 books = books,
