@@ -283,6 +283,7 @@ private fun BookDetailsScreenPreview() {
             ),
             innerPadding = PaddingValues(0.dp),
             onBackClick = TODO(),
+            onBookmarkClick = TODO()
         )
     }
 }

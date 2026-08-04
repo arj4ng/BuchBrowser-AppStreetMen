@@ -76,7 +76,7 @@ class BookDetailsViewModel(
     }
 
     /**
-     * TODO Logik zum Speichern der Buchmarked-Status.
+     * Logik zum Speichern der Buchmarked-Status.
      * uiState wird lokal aktualisiert damit sich das Icon sofort ändern kann
      *
      */
