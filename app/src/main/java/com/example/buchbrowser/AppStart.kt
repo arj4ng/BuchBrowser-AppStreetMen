@@ -125,7 +125,23 @@ fun AppStart() {
             modifier = Modifier.padding(innerPadding)
         ){
             composable<Route.Home> {
-                HomeScreen()
+                HomeScreen(
+                    onBookClick = { book ->
+                        navController.navigate(
+                            Route.Details(
+                                id = book.id,
+                                title = book.title,
+                                author = book.authorNames.firstOrNull() ?: "",
+                                coverUrl = book.coverUrl,
+                                firstPublishYear = book.firstPublishYear
+                            )
+
+                        )
+
+                    }
+
+                )
+
             }
 
             composable<Route.Favorite> {
