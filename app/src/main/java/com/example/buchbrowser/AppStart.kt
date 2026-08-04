@@ -56,6 +56,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.buchbrowser.viewmodels.HomeViewModel
 import com.example.buchbrowser.ui.theme.components.SearchBar
+import com.example.buchbrowser.viewmodels.ReadingListViewModel
 
 // app/src/main/java/com/example/buchbrowser/AppStart.kt
 // AppStart
@@ -99,6 +100,9 @@ fun AppStart() {
     }
     val detailsViewModel = remember {
         BookDetailsViewModel(repository = repository)
+    }
+    val readingListViewModel = remember {
+        ReadingListViewModel(repository = repository)
     }
     val homePreviewBook = remember {
         Book(
@@ -256,15 +260,21 @@ fun AppStart() {
                 )
             }
             composable<Route.ReadingList> {
-                ReadingListScreen()
+                ReadingListScreen(
+                    viewModel = readingListViewModel,
+                    onBookClick = { book ->
+                        navController.navigate(
+                            Route.Details(
+                                id = book.id,
+                                title = book.title,
+                                author = book.authorNames.firstOrNull() ?: "",
+                                coverUrl = book.coverUrl,
+                                firstPublishYear = book.firstPublishYear
+                            )
+                        )
+                    }
+                )
             }
-
-
-
-
-
-
-
 
         }
     }

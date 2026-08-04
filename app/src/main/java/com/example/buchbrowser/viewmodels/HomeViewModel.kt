@@ -32,16 +32,13 @@ class HomeViewModel(
     fun onSearch() {
         viewModelScope.launch {
             val queryToSearch = if (_searchQuery.value.isBlank()) "a" else _searchQuery.value
-
             val result = repository.searchBooks(query = queryToSearch)
             _books.value = result
         }
     }
 
     private fun loadInitialBooks(){
-        viewModelScope.launch {
-            val result = repository.searchBooks(query = "a")
-            _books.value = result
-        }
+        onQueryChange(newQuery = "a")
+        onSearch()
     }
 }
