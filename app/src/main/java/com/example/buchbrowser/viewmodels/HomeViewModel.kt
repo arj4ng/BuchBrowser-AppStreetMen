@@ -31,7 +31,9 @@ class HomeViewModel(
     //Die eigentliche Suche auslösen
     fun onSearch() {
         viewModelScope.launch {
-            val result = repository.searchBooks(query = _searchQuery.value)
+            val queryToSearch = if (_searchQuery.value.isBlank()) "a" else _searchQuery.value
+
+            val result = repository.searchBooks(query = queryToSearch)
             _books.value = result
         }
     }

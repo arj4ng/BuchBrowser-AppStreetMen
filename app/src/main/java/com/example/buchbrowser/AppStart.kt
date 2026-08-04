@@ -48,6 +48,14 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import com.example.buchbrowser.ui.theme.screens.readingList.ReadingListScreen
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.buchbrowser.viewmodels.HomeViewModel
+import com.example.buchbrowser.ui.theme.components.SearchBar
 
 // app/src/main/java/com/example/buchbrowser/AppStart.kt
 // AppStart
@@ -78,6 +86,11 @@ fun AppStart() {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
+    val homeViewModel: HomeViewModel = viewModel()
+    val searchQuery by homeViewModel.searchQuery.collectAsState()
+    var isSearchActive by remember { mutableStateOf(false) }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+
     val repository = remember {
         BookRepositoryImpl(
             api = ApiClient.openLibraryApi,
@@ -104,7 +117,6 @@ fun AppStart() {
             Log.d("AppNavigation", "Aktueller Screen geändert zu: ${destination.route}")
         }
     }
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     //dynamischen Title ermittlen
     val title = when {
@@ -126,21 +138,42 @@ fun AppStart() {
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
-                title = { Text(title) },
+                title = {
+                    if (isSearchActive && currentDestination?.hasRoute<Route.Home>() == true) {
+                        SearchBar(
+                            query = searchQuery,
+                            onQueryChange = { homeViewModel.onQueryChange(newQuery = it) },
+                            onSearch = { homeViewModel.onSearch() },
+                            placeholder = "Suchen..."
+                        )
+                    } else {
+                        Text(title)
+                    }
+                },
                 scrollBehavior = scrollBehavior,
                 navigationIcon = {
-                    if (canNavigateBack) {
+                    if (isSearchActive && currentDestination?.hasRoute<Route.Home>() == true) {
+                        IconButton(onClick = {
+                            isSearchActive = false
+                            homeViewModel.onQueryChange(newQuery = "")
+                            homeViewModel.onSearch()
+                        }) {
+                            Icon(imageVector = Icons.Default.Close, contentDescription = "Suche beenden")
+                        }
+                    } else if (canNavigateBack) {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Zurück")
                         }
                     }
                 },
                 actions = {
-                    IconButton(onClick = { navController.navigate(Route.Home) }) {
-                        Icon(imageVector = Icons.Default.Search, contentDescription = "Suche")
+                    if (!isSearchActive && currentDestination?.hasRoute<Route.Home>() == true) {
+                        IconButton(onClick = { isSearchActive = true }) {
+                            Icon(imageVector = Icons.Default.Search, contentDescription = "Suche öffnen")
+                        }
                     }
                     IconButton(onClick = { navController.navigate(Route.ReadingList) }) {
-                        Icon(imageVector = Icons.Default.List, contentDescription = "Leseliste")
+                        Icon(imageVector = Icons.Default.Bookmark, contentDescription = "Leseliste")
                     }
                 }
             )
@@ -149,7 +182,13 @@ fun AppStart() {
             NavigationBar {
                 NavigationBarItem(
                     selected = currentDestination?.hierarchy?.any { it.hasRoute<Route.Home>() } == true,
-                    onClick = { navigateToTab(navController, targetRoute = Route.Home) },
+                    onClick = {
+                        isSearchActive = false
+                        navigateToTab(
+                            navController,
+                            targetRoute = Route.Home
+                        )
+                    },
                     icon = { Icon(imageVector = Icons.Default.Home, contentDescription = "Home") },
                     label = { Text("Home") }
                 )
@@ -175,6 +214,7 @@ fun AppStart() {
         ){
             composable<Route.Home> {
                 HomeScreen(
+                    homeViewModel = homeViewModel,
                     onBookClick = { book ->
                         navController.navigate(
                             Route.Details(
@@ -188,9 +228,7 @@ fun AppStart() {
                         )
 
                     }
-
                 )
-
             }
 
             composable<Route.Favorite> {
