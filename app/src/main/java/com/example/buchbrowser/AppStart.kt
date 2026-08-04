@@ -48,7 +48,7 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import com.example.buchbrowser.ui.theme.screens.readingList.ReadingListScreen
-import com.example.buchbrowser.ui.theme.screens.readinglist.ReadingListScreen
+
 // app/src/main/java/com/example/buchbrowser/AppStart.kt
 // AppStart
 //
