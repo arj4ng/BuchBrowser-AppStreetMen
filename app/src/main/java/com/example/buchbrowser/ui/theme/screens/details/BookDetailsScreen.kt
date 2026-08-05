@@ -23,8 +23,9 @@ import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -36,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -139,37 +141,6 @@ fun BookDetailsContent(
             .padding(horizontal = 24.dp, vertical = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-
-
-            // rechts: Favorit (Herz) + Merken (Bookmark) nebeneinander
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // --- Favoriten-Button ---
-                IconButton(onClick = onFavoriteClick) {
-                    Icon(
-                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = "Favorit",
-                        tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                    )
-                }
-
-                // --- Merken-Button (Leseliste, unverändert) ---
-                IconButton(onClick = onBookmarkClick) {
-                    Icon(
-                        imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                        contentDescription = "Merken",
-                        tint = if (isBookmarked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
         BookHeroCover(
             title = book.title,
             coverUrl = book.coverUrl,
@@ -178,22 +149,82 @@ fun BookDetailsContent(
 
         Text(
             text = book.title,
+            modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Start,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
             text = book.authorNames.joinToString().ifBlank { "Autor unbekannt" },
+            modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Start,
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Button(
+                onClick = onFavoriteClick,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isFavorite) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant
+                    },
+                    contentColor = if (isFavorite) {
+                        MaterialTheme.colorScheme.onPrimary
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    },
+                ),
+            ) {
+                Icon(
+                    imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = "Favorit",
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(text = if (isFavorite) "Favorisiert" else "Favorisieren")
+            }
+
+            Button(
+                onClick = onBookmarkClick,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isBookmarked) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant
+                    },
+                    contentColor = if (isBookmarked) {
+                        MaterialTheme.colorScheme.onPrimary
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    },
+                ),
+            ) {
+                Icon(
+                    imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                    contentDescription = "Merken",
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(text = if (isBookmarked) "Gemerkt" else "Merken")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
         DetailsMetaBlock(
-            bookId = book.id,
             publishYear = book.firstPublishYear,
         )
 
@@ -250,6 +281,16 @@ fun BookDetailsContent(
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
+            text = "OpenLibrary ID: ${book.id}",
+            modifier = Modifier.fillMaxWidth(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Start,
+        )
     }
 }
 
@@ -286,7 +327,6 @@ private fun BookHeroCover(
 
 @Composable
 private fun DetailsMetaBlock(
-    bookId: String,
     publishYear: Int?,
 ) {
     Column(
@@ -296,11 +336,6 @@ private fun DetailsMetaBlock(
         Text(
             text = "Erscheinungsjahr: ${publishYear ?: "Unbekannt"}",
             style = MaterialTheme.typography.bodyLarge,
-        )
-        Text(
-            text = "OpenLibrary ID: $bookId",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
