@@ -39,6 +39,17 @@ object ApiClient {
 
     // hier hängt das Logging direkt am Client
     private val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor { chain ->
+            val request = chain.request()
+                .newBuilder()
+                .header(
+                    "User-Agent",
+                    "BuchBrowser/1.0 (test@example.com)"
+                )
+                .build()
+
+            chain.proceed(request)
+        }
         .addInterceptor(loggingInterceptor)
         .build()
 

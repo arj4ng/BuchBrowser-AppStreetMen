@@ -37,7 +37,7 @@ class MockBookRepository(
             id = "/works/OL45883W",
             title = "Der kleine Hobbit",
             authorNames = listOf("J. R. R. Tolkien"),
-            coverUrl = "https://covers.openlibrary.org/b/id/14625727-M.jpg",
+            coverUrl = "https://openlibrary.org/search.json?q=the+lord+of+the+rings",
             firstPublishYear = 1937,
             languageCodes = listOf("ger"),
             isSeen = false,

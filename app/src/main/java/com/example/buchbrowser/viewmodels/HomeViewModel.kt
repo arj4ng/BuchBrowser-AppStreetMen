@@ -53,7 +53,7 @@ class HomeViewModel(
     private fun loadInitialBooks() {
         viewModelScope.launch {
             try {
-                val result = repository.searchBooks("a")
+                val result = repository.searchBooks("bestseller")
                 allBooks = result
                 _books.value = result
             } catch (e: Exception) {
@@ -88,21 +88,22 @@ class HomeViewModel(
 
     fun searchBooks() {
 
+        val query = searchQuery.value.trim()
+
+        if (query.length < 3) {
+            _books.value = emptyList()
+            return
+        }
+
         viewModelScope.launch {
-
             try {
+                val result = repository.searchBooks(query)
 
-                val result = repository.searchBooks(searchQuery.value)
-
-                allBooks = result
                 _books.value = result
                 _errorMessage.value = null
 
             } catch (e: Exception) {
-
                 _books.value = emptyList()
-                _errorMessage.value =
-                    "Die OpenLibrary ist momentan nicht erreichbar.\nBitte versuche es später erneut."
             }
         }
     }
