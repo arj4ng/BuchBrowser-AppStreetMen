@@ -149,39 +149,18 @@ fun AppStart() {
         topBar = {
             TopAppBar(
                 title = {
-                    if (isSearchActive && currentDestination?.hasRoute<Route.Home>() == true) {
-                        SearchBar(
-                            query = searchQuery,
-                            onQueryChange = { homeViewModel.onQueryChange(newQuery = it) },
-                            onSearch = { homeViewModel.onSearch() },
-                            placeholder = "Suchen..."
-                        )
-                    } else {
                         Text(title)
-                    }
+
                 },
                 scrollBehavior = scrollBehavior,
                 navigationIcon = {
-                    if (isSearchActive && currentDestination?.hasRoute<Route.Home>() == true) {
-                        IconButton(onClick = {
-                            isSearchActive = false
-                            homeViewModel.onQueryChange(newQuery = "")
-                            homeViewModel.onSearch()
-                        }) {
-                            Icon(imageVector = Icons.Default.Close, contentDescription = "Suche beenden")
-                        }
-                    } else if (canNavigateBack) {
+                   if (canNavigateBack) {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Zurück")
                         }
                     }
                 },
                 actions = {
-                    if (!isSearchActive && currentDestination?.hasRoute<Route.Home>() == true) {
-                        IconButton(onClick = { isSearchActive = true }) {
-                            Icon(imageVector = Icons.Default.Search, contentDescription = "Suche öffnen")
-                        }
-                    }
                     IconButton(onClick = { navController.navigate(Route.ReadingList) }) {
                         Icon(imageVector = Icons.Default.Bookmark, contentDescription = "Leseliste")
                     }

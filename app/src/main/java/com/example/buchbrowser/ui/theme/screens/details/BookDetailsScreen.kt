@@ -144,13 +144,7 @@ fun BookDetailsContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Zurück links
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Zurück"
-                )
-            }
+
 
             // rechts: Favorit (Herz) + Merken (Bookmark) nebeneinander
             Row(verticalAlignment = Alignment.CenterVertically) {

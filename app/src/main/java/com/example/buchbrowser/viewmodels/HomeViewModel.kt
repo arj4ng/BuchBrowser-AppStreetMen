@@ -64,7 +64,7 @@ class HomeViewModel(
     private fun loadInitialBooks() {
         viewModelScope.launch {
             try {
-                val result = repository.searchBooks("bestseller")
+                val result = repository.searchBooks("harry")
                 allBooks = result
                 _books.value = result
             } catch (e: Exception) {
