@@ -37,7 +37,7 @@ class MockBookRepository(
             id = "/works/OL45883W",
             title = "Der kleine Hobbit",
             authorNames = listOf("J. R. R. Tolkien"),
-            coverUrl = "https://covers.openlibrary.org/b/id/14625727-M.jpg",
+            coverUrl = "https://openlibrary.org/search.json?q=the+lord+of+the+rings",
             firstPublishYear = 1937,
             languageCodes = listOf("ger"),
             isSeen = false,
@@ -67,20 +67,21 @@ class MockBookRepository(
 
     // sucht nur in den Mockdaten, fühlt sich nach außen aber wie das echte Repo an
     override suspend fun searchBooks(query: String): List<Book> {
+
         val normalizedQuery = query.trim().lowercase()
+
         if (normalizedQuery.isBlank()) {
-            return emptyList()
+            return sampleBooks.map { book ->
+                book.copy(isSeen = seenBookIds.contains(book.id))
+            }
         }
 
         return sampleBooks.filter { book ->
-            val titleMatches = book.title.lowercase().contains(normalizedQuery)
-            val authorMatches = book.authorNames.any { authorName ->
-                authorName.lowercase().contains(normalizedQuery)
-            }
-
-            titleMatches || authorMatches
+            book.title.lowercase().contains(normalizedQuery) ||
+                    book.authorNames.any { author ->
+                        author.lowercase().contains(normalizedQuery)
+                    }
         }.map { book ->
-            // setzt den lokalen Gesehen Status direkt auf den Treffer
             book.copy(isSeen = seenBookIds.contains(book.id))
         }
     }
