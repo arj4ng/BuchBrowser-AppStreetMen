@@ -22,6 +22,8 @@ import coil.compose.AsyncImage
 import androidx.compose.runtime.Composable
 import com.example.buchbrowser.data.Book
 import androidx.compose.foundation.combinedClickable
+import com.example.buchbrowser.ui.theme.BuchBrowserTheme
+
 @Composable
 fun BookCard(
     book: Book,
@@ -29,7 +31,6 @@ fun BookCard(
     onClick: () -> Unit = {},
     onDoubleClick: () -> Unit = {}
 ) {
-
     var selected by remember {
         mutableStateOf(false)
     }
@@ -48,27 +49,17 @@ fun BookCard(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-
             .combinedClickable(
-
-                onClick = {
-
-                    onClick()
-
-                },
-
+                onClick = { onClick() },
                 onDoubleClick = {
-
                     selected = !selected
-
                     onDoubleClick()
-
                 }
-
             )
-    ){
+            .padding(4.dp)
+    ) {
         Row(
-            modifier = Modifier.height(230.dp)
+            modifier = Modifier.height(180.dp)
         ) {
             Card(
                 elevation = CardDefaults.cardElevation(elevation.dp),
@@ -82,26 +73,46 @@ fun BookCard(
                         model = book.coverUrl,
                         contentDescription = book.title,
                         modifier = Modifier
-                            .width(150.dp)
-                            .height(230.dp),
+                            .width(120.dp)
+                            .height(180.dp),
                         contentScale = ContentScale.Crop
                     )
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
-                            .width(10.dp)
+                            .width(8.dp)
                             .background(Color(0xFF5C4033))
                             .align(Alignment.CenterStart)
                     )
                 }
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = book.title,
             style = MaterialTheme.typography.titleSmall,
-            maxLines = 2
+            maxLines = 1,
+            modifier = Modifier.padding(horizontal = 4.dp)
         )
 
+    }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+private fun BookCardPreview() {
+    val previewBooks = listOf(
+        Book("1", "Zora Neale", listOf("Hurston"), "https://covers.openlibrary.org/b/id/8231856-M.jpg", null, listOf("en"), false),
+        Book("2", "Der alte Mann", listOf("Hemingway"), "https://covers.openlibrary.org/b/id/8231856-M.jpg", null, listOf("de"), false),
+        Book("3", "1984", listOf("Orwell"), "https://covers.openlibrary.org/b/id/8231856-M.jpg", null, listOf("en"), false),
+        Book("4", "Moby Dick", listOf("Melville"), "https://covers.openlibrary.org/b/id/8231856-M.jpg", null, listOf("en"), false)
+    )
+
+    BuchBrowserTheme {
+        BookCard(
+            book = previewBooks[0],
+            onClick = {},
+            onDoubleClick = {}
+        )
     }
 }

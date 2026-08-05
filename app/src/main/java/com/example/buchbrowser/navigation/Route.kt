@@ -8,8 +8,6 @@ import kotlinx.serialization.Serializable
  * Jede Route wird als typsicheres, serialisierbares Objekt definiert, um Fehler
  * bei der Argumentenübergabe und Tippfehler in Pfad-Strings zur Kompilierzeit zu vermeiden.
  *
- * @see Route.Home
- * @see Route.Search
  */
 sealed interface Route {
 
@@ -19,6 +17,8 @@ sealed interface Route {
     data object Favorite : Route
     @Serializable
     data object Settings : Route
+    @Serializable
+    data object ReadingList : Route
 
     @Serializable
     data class Details(

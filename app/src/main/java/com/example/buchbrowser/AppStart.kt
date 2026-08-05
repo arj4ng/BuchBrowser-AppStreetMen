@@ -32,12 +32,32 @@ import com.example.buchbrowser.ui.theme.components.BookCard
 import com.example.buchbrowser.viewmodels.BookDetailsViewModel
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import com.example.buchbrowser.ui.theme.screens.details.BookDetailsScreen
 import com.example.buchbrowser.ui.theme.screens.home.HomeScreen
 import com.example.buchbrowser.ui.theme.screens.favorite.FavoriteScreen
 import com.example.buchbrowser.ui.theme.screens.settings.SettingsScreen
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import com.example.buchbrowser.ui.theme.screens.readingList.ReadingListScreen
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.buchbrowser.viewmodels.HomeViewModel
+import com.example.buchbrowser.ui.theme.components.SearchBar
+import com.example.buchbrowser.viewmodels.ReadingListViewModel
+import com.example.buchbrowser.viewmodels.FavoritesViewModel
 
 // app/src/main/java/com/example/buchbrowser/AppStart.kt
 // AppStart
@@ -61,13 +81,18 @@ import com.example.buchbrowser.ui.theme.screens.settings.SettingsScreen
 // TODO: ┏━ PROJEKTWOCHE | DETAILS
 // TODO: ┗━ Details Navigation einhängen
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppStart() {
     val context = LocalContext.current
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
+    val homeViewModel: HomeViewModel = viewModel()
+    val searchQuery by homeViewModel.searchQuery.collectAsState()
+    var isSearchActive by remember { mutableStateOf(false) }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+
     val repository = remember {
         BookRepositoryImpl(
             api = ApiClient.openLibraryApi,
@@ -77,6 +102,14 @@ fun AppStart() {
     val detailsViewModel = remember {
         BookDetailsViewModel(repository = repository)
     }
+    val readingListViewModel = remember {
+        ReadingListViewModel()
+    }
+// EINE geteilte Instanz für Detail- UND Favoriten-Screen
+    val favoritesViewModel = remember {
+        FavoritesViewModel()
+    }
+
     val homePreviewBook = remember {
         Book(
             id = "/works/OL21177W",
@@ -95,25 +128,90 @@ fun AppStart() {
         }
     }
 
+    //dynamischen Title ermittlen
+    val title = when {
+        currentDestination?.hasRoute<Route.Home>() == true -> "BuchBrowser"
+        currentDestination?.hasRoute<Route.Favorite>() == true -> "Favoriten"
+        currentDestination?.hasRoute<Route.Settings>() == true -> "Einstellungen"
+        currentDestination?.hasRoute<Route.Details>() == true -> "Details"
+        currentDestination?.hasRoute<Route.ReadingList>() == true -> "Leseliste"
+        else -> "BuchBrowser"
+    }
+
+    //Prüfen ob wir einen Zurück-Button brauchen
+    val canNavigateBack = navController.previousBackStackEntry != null &&
+            currentDestination?.hasRoute<Route.Home>() == false &&
+            currentDestination?.hasRoute<Route.Favorite>() == false &&
+            currentDestination?.hasRoute<Route.Settings>() == false
+
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            TopAppBar(
+                title = {
+                    if (isSearchActive && currentDestination?.hasRoute<Route.Home>() == true) {
+                        SearchBar(
+                            query = searchQuery,
+                            onQueryChange = { homeViewModel.onQueryChange(newQuery = it) },
+                            onSearch = { homeViewModel.onSearch() },
+                            placeholder = "Suchen..."
+                        )
+                    } else {
+                        Text(title)
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+                navigationIcon = {
+                    if (isSearchActive && currentDestination?.hasRoute<Route.Home>() == true) {
+                        IconButton(onClick = {
+                            isSearchActive = false
+                            homeViewModel.onQueryChange(newQuery = "")
+                            homeViewModel.onSearch()
+                        }) {
+                            Icon(imageVector = Icons.Default.Close, contentDescription = "Suche beenden")
+                        }
+                    } else if (canNavigateBack) {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Zurück")
+                        }
+                    }
+                },
+                actions = {
+                    if (!isSearchActive && currentDestination?.hasRoute<Route.Home>() == true) {
+                        IconButton(onClick = { isSearchActive = true }) {
+                            Icon(imageVector = Icons.Default.Search, contentDescription = "Suche öffnen")
+                        }
+                    }
+                    IconButton(onClick = { navController.navigate(Route.ReadingList) }) {
+                        Icon(imageVector = Icons.Default.Bookmark, contentDescription = "Leseliste")
+                    }
+                }
+            )
+        },
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(
                     selected = currentDestination?.hierarchy?.any { it.hasRoute<Route.Home>() } == true,
-                    onClick = { navigateToTab(navController, targetRoute = Route.Home) },
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    onClick = {
+                        isSearchActive = false
+                        navigateToTab(
+                            navController,
+                            targetRoute = Route.Home
+                        )
+                    },
+                    icon = { Icon(imageVector = Icons.Default.Home, contentDescription = "Home") },
                     label = { Text("Home") }
                 )
                 NavigationBarItem(
                     selected = currentDestination?.hierarchy?.any { it.hasRoute<Route.Favorite>() } == true,
                     onClick = { navigateToTab(navController, targetRoute = Route.Favorite) },
-                    icon = { Icon(Icons.Default.Favorite, contentDescription = "Favoriten") },
+                    icon = { Icon(imageVector = Icons.Default.Favorite, contentDescription = "Favoriten") },
                     label = { Text("Favoriten") }
                 )
                 NavigationBarItem(
                     selected = currentDestination?.hierarchy?.any { it.hasRoute<Route.Settings>() } == true,
                     onClick = { navigateToTab(navController, targetRoute = Route.Settings) },
-                    icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+                    icon = { Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings") },
                     label = { Text("Settings") }
                 )
             }
@@ -126,6 +224,7 @@ fun AppStart() {
         ){
             composable<Route.Home> {
                 HomeScreen(
+                    homeViewModel = homeViewModel,
                     onBookClick = { book ->
                         navController.navigate(
                             Route.Details(
@@ -139,13 +238,24 @@ fun AppStart() {
                         )
 
                     }
-
                 )
-
             }
 
             composable<Route.Favorite> {
-                FavoriteScreen()
+                FavoriteScreen(
+                    favoritesViewModel = favoritesViewModel,
+                    onBookClick = { book ->
+                        navController.navigate(
+                            Route.Details(
+                                id = book.id,
+                                title = book.title,
+                                author = book.authorNames.firstOrNull() ?: "",
+                                coverUrl = book.coverUrl,
+                                firstPublishYear = book.firstPublishYear
+                            )
+                        )
+                    }
+                )
             }
             composable<Route.Settings> {
                 SettingsScreen()
@@ -155,6 +265,8 @@ fun AppStart() {
 
                 BookDetailsScreen(
                     viewModel = detailsViewModel,
+                    favoritesViewModel = favoritesViewModel,
+                    readingListViewModel = readingListViewModel,
                     book = Book(
                         id = route.id,
                         title = route.title,
@@ -168,13 +280,22 @@ fun AppStart() {
                     onBackClick = { navController.popBackStack() },
                 )
             }
-
-
-
-
-
-
-
+            composable<Route.ReadingList> {
+                ReadingListScreen(
+                    viewModel = readingListViewModel,
+                    onBookClick = { book ->
+                        navController.navigate(
+                            Route.Details(
+                                id = book.id,
+                                title = book.title,
+                                author = book.authorNames.firstOrNull() ?: "",
+                                coverUrl = book.coverUrl,
+                                firstPublishYear = book.firstPublishYear
+                            )
+                        )
+                    }
+                )
+            }
 
         }
     }

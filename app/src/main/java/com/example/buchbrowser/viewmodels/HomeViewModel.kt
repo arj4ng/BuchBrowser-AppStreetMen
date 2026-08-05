@@ -45,6 +45,16 @@ class HomeViewModel(
         viewModelScope.launch {
             val result = MockBookRepository().searchBooks("")
             allBooks = result
+    }
+    //Aktualisieren des Suchbegriffs
+    fun onQueryChange(newQuery: String) {
+        _searchQuery.value = newQuery
+    }
+    //Die eigentliche Suche auslösen
+    fun onSearch() {
+        viewModelScope.launch {
+            val queryToSearch = if (_searchQuery.value.isBlank()) "a" else _searchQuery.value
+            val result = repository.searchBooks(query = queryToSearch)
             _books.value = result
             _errorMessage.value = null
         }
@@ -108,4 +118,8 @@ class HomeViewModel(
         }
     }
 
+    private fun loadInitialBooks(){
+        onQueryChange(newQuery = "a")
+        onSearch()
+    }
 }
