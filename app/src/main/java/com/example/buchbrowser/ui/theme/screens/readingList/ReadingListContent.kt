@@ -3,6 +3,7 @@ package com.example.buchbrowser.ui.theme.screens.readingList
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,6 +19,8 @@ fun ReadingListContent(
     onBookClick: (Book) -> Unit,
     onFavoriteClick: (Book) -> Unit
 ) {
+    val gridState = rememberLazyGridState()
+
     Column(modifier = Modifier.fillMaxSize()) {
 
         if (isLoading) {
@@ -33,6 +36,7 @@ fun ReadingListContent(
             BookGrid(
                 books = books,
                 favorites = favorites,
+                gridState = gridState,
                 onBookClick = onBookClick,
                 onFavoriteClick = onFavoriteClick
             )
