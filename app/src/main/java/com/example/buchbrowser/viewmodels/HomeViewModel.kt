@@ -24,6 +24,10 @@ class HomeViewModel(
     private val repository: BookRepository = ApiBookRepository()
 
 ) : ViewModel() {
+    private companion object {
+        const val INITIAL_QUERY = "bestseller"
+    }
+
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
     private var allBooks: List<Book> = emptyList()
@@ -35,6 +39,12 @@ class HomeViewModel(
     private val _searchQuery = MutableStateFlow("")
 
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _isRandomMode = MutableStateFlow(false)
+    val isRandomMode: StateFlow<Boolean> = _isRandomMode.asStateFlow()
 
     init {
 
@@ -63,15 +73,20 @@ class HomeViewModel(
     }
     private fun loadInitialBooks() {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
-                val result = repository.searchBooks("bestseller")
+                val result = repository.searchBooks(INITIAL_QUERY)
                 allBooks = result
                 _books.value = result
+                _isRandomMode.value = false
+                _errorMessage.value = null
             } catch (e: Exception) {
                 e.printStackTrace()
                 _books.value = emptyList()
                 _errorMessage.value =
                     "Die OpenLibrary ist momentan nicht erreichbar.\nBitte versuche es später erneut."
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -111,10 +126,42 @@ class HomeViewModel(
                 val result = repository.searchBooks(query)
 
                 _books.value = result
+                _isRandomMode.value = false
                 _errorMessage.value = null
 
             } catch (e: Exception) {
                 _books.value = emptyList()
+            }
+        }
+    }
+
+    fun toggleRandomBooks() {
+        if (_isRandomMode.value) {
+            loadInitialBooks()
+            return
+        }
+
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val randomBooks = buildList {
+                    repeat(12) {
+                        repository.getRandomBook()?.let(::add)
+                    }
+                }.distinctBy { book -> book.id }
+
+                _books.value = randomBooks
+                _isRandomMode.value = randomBooks.isNotEmpty()
+                _errorMessage.value = if (randomBooks.isEmpty()) {
+                    "Zufallsbuch gerade nicht verfügbar.\nBitte versuche es später erneut."
+                } else null
+            } catch (e: Exception) {
+                _books.value = emptyList()
+                _isRandomMode.value = false
+                _errorMessage.value =
+                    "Zufallsbuch gerade nicht verfügbar.\nBitte versuche es später erneut."
+            } finally {
+                _isLoading.value = false
             }
         }
     }

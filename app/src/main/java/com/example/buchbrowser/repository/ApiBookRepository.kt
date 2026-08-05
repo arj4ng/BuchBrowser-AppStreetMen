@@ -5,8 +5,21 @@ import com.example.buchbrowser.api.ApiClient
 import com.example.buchbrowser.api.toBook
 import com.example.buchbrowser.api.toDescription
 import com.example.buchbrowser.data.Book
+import kotlin.random.Random
 
-class ApiBookRepository : BookRepository {
+class ApiBookRepository(
+    private val random: Random = Random.Default,
+) : BookRepository {
+
+    private val randomQueries = listOf(
+        "bestseller",
+        "fantasy",
+        "science fiction",
+        "mystery",
+        "romance",
+        "history",
+        "biography",
+    )
 
     override suspend fun searchBooks(query: String): List<Book> {
 
@@ -25,8 +38,18 @@ class ApiBookRepository : BookRepository {
     }
 
     override suspend fun getRandomBook(): Book? {
+        randomQueries.shuffled(random).forEach { query ->
+            runCatching {
+                searchBooks(query)
+            }.getOrNull()
+                ?.filter { book -> book.title.isNotBlank() && book.id.isNotBlank() }
+                ?.takeIf { it.isNotEmpty() }
+                ?.let { books ->
+                    return books[random.nextInt(books.size)]
+                }
+        }
 
-        return searchBooks("a").randomOrNull()
+        return null
     }
 
     override suspend fun getSeenBooks(): List<Book> {

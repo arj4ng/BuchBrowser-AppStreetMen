@@ -1,9 +1,8 @@
 package com.example.buchbrowser.ui.theme.components
-
-import android.app.ProgressDialog.show
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -21,6 +20,8 @@ fun BookGrid(
 
     favorites: List<Book>,
 
+    gridState: LazyGridState,
+
     modifier: Modifier = Modifier,
 
     onBookClick: (Book) -> Unit,
@@ -28,6 +29,7 @@ fun BookGrid(
     onFavoriteClick: (Book) -> Unit
 
 ) {LazyVerticalGrid(
+        state = gridState,
         columns = GridCells.Fixed(count = 2),
         contentPadding = PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -49,4 +51,3 @@ fun BookGrid(
         }
     }
 }
-
