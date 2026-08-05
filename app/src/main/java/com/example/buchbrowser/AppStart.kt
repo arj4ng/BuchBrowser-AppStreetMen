@@ -57,6 +57,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.buchbrowser.viewmodels.HomeViewModel
 import com.example.buchbrowser.ui.theme.components.SearchBar
 import com.example.buchbrowser.viewmodels.ReadingListViewModel
+import com.example.buchbrowser.viewmodels.FavoritesViewModel
 
 // app/src/main/java/com/example/buchbrowser/AppStart.kt
 // AppStart
@@ -102,8 +103,13 @@ fun AppStart() {
         BookDetailsViewModel(repository = repository)
     }
     val readingListViewModel = remember {
-        ReadingListViewModel(repository = repository)
+        ReadingListViewModel()
     }
+// EINE geteilte Instanz für Detail- UND Favoriten-Screen
+    val favoritesViewModel = remember {
+        FavoritesViewModel()
+    }
+
     val homePreviewBook = remember {
         Book(
             id = "/works/OL21177W",
@@ -236,7 +242,20 @@ fun AppStart() {
             }
 
             composable<Route.Favorite> {
-                FavoriteScreen()
+                FavoriteScreen(
+                    favoritesViewModel = favoritesViewModel,
+                    onBookClick = { book ->
+                        navController.navigate(
+                            Route.Details(
+                                id = book.id,
+                                title = book.title,
+                                author = book.authorNames.firstOrNull() ?: "",
+                                coverUrl = book.coverUrl,
+                                firstPublishYear = book.firstPublishYear
+                            )
+                        )
+                    }
+                )
             }
             composable<Route.Settings> {
                 SettingsScreen()
@@ -246,6 +265,8 @@ fun AppStart() {
 
                 BookDetailsScreen(
                     viewModel = detailsViewModel,
+                    favoritesViewModel = favoritesViewModel,
+                    readingListViewModel = readingListViewModel,
                     book = Book(
                         id = route.id,
                         title = route.title,

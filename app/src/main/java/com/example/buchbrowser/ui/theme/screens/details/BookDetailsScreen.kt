@@ -18,6 +18,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +30,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,9 +44,8 @@ import com.example.buchbrowser.data.Book
 import com.example.buchbrowser.ui.theme.BuchBrowserTheme
 import com.example.buchbrowser.viewmodels.BookDetailsUiState
 import com.example.buchbrowser.viewmodels.BookDetailsViewModel
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.BookmarkBorder
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.buchbrowser.viewmodels.FavoritesViewModel
+import com.example.buchbrowser.viewmodels.ReadingListViewModel
 
 // app/src/main/java/com/example/buchbrowser/ui/theme/screens/details/BookDetailsScreen.kt
 // BookDetailsScreen
@@ -56,7 +61,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
   ║ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚════╝       ╚═╝ ╚═╝  ╚═══╝  ╚═════╝  ║
   ╚═════════════════════════════════════════ [ DEV TAG ] ══╝
 */
-
 // TODO: ╔══ [ BuchBrowser ] ══╗
 // TODO: ║BookDetailsScreen.kt ║
 // TODO: ╚═════════════════════╝
@@ -64,9 +68,20 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 // TODO: ┏━ PROJEKTWOCHE | DETAILS
 // TODO: ┗━ Buch schön im Fokus zeigen
 
+/**
+ * Detailansicht eines Buchs inklusive Zurück-, Favoriten- und Merken-Button.
+ *
+ * @param viewModel          Detail-ViewModel (lädt u. a. die Beschreibung nach).
+ * @param favoritesViewModel Geteiltes Favoriten-ViewModel (dieselbe Instanz wie im Favoriten-Screen!).
+ * @param book               Das anzuzeigende Buch (kommt aus der Navigation).
+ * @param innerPadding       Padding vom umgebenden Scaffold.
+ * @param onBackClick        Callback für den Zurück-Button.
+ */
 @Composable
 fun BookDetailsScreen(
     viewModel: BookDetailsViewModel,
+    favoritesViewModel: FavoritesViewModel,
+    readingListViewModel: ReadingListViewModel,
     book: Book,
     innerPadding: PaddingValues,
     onBackClick: () -> Unit
@@ -76,11 +91,29 @@ fun BookDetailsScreen(
         viewModel.setBook(book)
     }
 
+    // Favoriten beobachten -> Herz-Zustand aktualisiert sich sofort beim Tippen
+    val favorites by favoritesViewModel.favorites.collectAsState()
+    val currentBook = viewModel.uiState.book
+    val isFavorite = currentBook != null && favorites.any { it.id == currentBook.id }
+
+    // Merkliste beobachten -> Bookmark-Zustand aktualisiert sich sofort beim Tippen
+    val readingList by readingListViewModel.books.collectAsState()
+    val isBookmarked = currentBook != null && readingList.any { it.id == currentBook.id }
+
     BookDetailsContent(
         uiState = viewModel.uiState,
         innerPadding = innerPadding,
+        isFavorite = isFavorite,
+        isBookmarked = isBookmarked,
         onBackClick = onBackClick,
-        onBookmarkClick = { viewModel.toggleBookmark() }
+        // Merken-Klick: aktuelles Buch in der Merkliste toggeln
+        onBookmarkClick = {
+            viewModel.uiState.book?.let { readingListViewModel.toggleBookmark(it) }
+        },
+        // Herz-Klick: aktuelles Buch in die Favoriten toggeln
+        onFavoriteClick = {
+            viewModel.uiState.book?.let { favoritesViewModel.toggleFavorite(it) }
+        },
     )
 }
 
@@ -88,8 +121,11 @@ fun BookDetailsScreen(
 fun BookDetailsContent(
     uiState: BookDetailsUiState,
     innerPadding: PaddingValues,
+    isFavorite: Boolean,
+    isBookmarked: Boolean,
     onBackClick: () -> Unit,
-    onBookmarkClick: () -> Unit
+    onBookmarkClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
 ) {
     val book = uiState.book ?: return
 
@@ -108,22 +144,33 @@ fun BookDetailsContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            IconButton(
-                onClick = onBackClick
-            ) {
+            // Zurück links
+            IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Zurück"
                 )
             }
-            IconButton(
-                onClick = onBookmarkClick
-            ){
-                Icon(
-                    imageVector = if (uiState.book?.isSeen == true) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                    contentDescription = "Merken",
-                    tint = if (uiState.book?.isSeen == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                )
+
+            // rechts: Favorit (Herz) + Merken (Bookmark) nebeneinander
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // --- Favoriten-Button ---
+                IconButton(onClick = onFavoriteClick) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = "Favorit",
+                        tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                // --- Merken-Button (Leseliste, unverändert) ---
+                IconButton(onClick = onBookmarkClick) {
+                    Icon(
+                        imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                        contentDescription = "Merken",
+                        tint = if (isBookmarked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         }
 
@@ -282,8 +329,11 @@ private fun BookDetailsScreenPreview() {
                 description = "Bilbo stolpert in ein Abenteuer, das erst klein anfängt und dann immer größer wird. Genau daraus zieht der Screen seinen ruhigen, buchigen Mittelpunkt.",
             ),
             innerPadding = PaddingValues(0.dp),
-            onBackClick = TODO(),
-            onBookmarkClick = TODO()
+            isFavorite = false,
+            isBookmarked = false,
+            onBackClick = {},
+            onBookmarkClick = {},
+            onFavoriteClick = {},
         )
     }
 }
