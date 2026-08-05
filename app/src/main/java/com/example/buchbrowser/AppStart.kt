@@ -203,20 +203,33 @@ fun AppStart() {
         ){
             composable<Route.Home> {
                 HomeScreen(
+
                     homeViewModel = homeViewModel,
+
+                    favoritesViewModel = favoritesViewModel,
+
                     onBookClick = { book ->
+
                         navController.navigate(
+
                             Route.Details(
+
                                 id = book.id,
+
                                 title = book.title,
+
                                 author = book.authorNames.firstOrNull() ?: "",
+
                                 coverUrl = book.coverUrl,
+
                                 firstPublishYear = book.firstPublishYear
+
                             )
 
                         )
 
                     }
+
                 )
             }
 
@@ -261,18 +274,33 @@ fun AppStart() {
             }
             composable<Route.ReadingList> {
                 ReadingListScreen(
+
                     viewModel = readingListViewModel,
+
+                    favoritesViewModel = favoritesViewModel,
+
                     onBookClick = { book ->
+
                         navController.navigate(
+
                             Route.Details(
+
                                 id = book.id,
+
                                 title = book.title,
+
                                 author = book.authorNames.firstOrNull() ?: "",
+
                                 coverUrl = book.coverUrl,
+
                                 firstPublishYear = book.firstPublishYear
+
                             )
+
                         )
+
                     }
+
                 )
             }
 
@@ -281,23 +309,7 @@ fun AppStart() {
 }
 
 
-@Composable
-private fun HomeRouteContent(
-    book: Book,
-    innerPadding: PaddingValues,
-    onBookClick: (Book) -> Unit,
-) {
-    BookCard(
-        book = book,
-        modifier = Modifier.padding(innerPadding),
-        onClick = {
-            onBookClick(book)
-        },
-        onDoubleClick = {
-            //später dafür da um das Buch zu drehen
-        }
-    )
-}
+
 
 private fun navigateToTab(
     navController: NavController,

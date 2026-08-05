@@ -16,11 +16,18 @@ import com.example.buchbrowser.ui.theme.BuchBrowserTheme
 
 @Composable
 fun BookGrid(
+
     books: List<Book>,
+
+    favorites: List<Book>,
+
     modifier: Modifier = Modifier,
-    onBookClick: (Book) -> Unit //vorbereitung für die Detailansicht
-){
-    LazyVerticalGrid(
+
+    onBookClick: (Book) -> Unit,
+
+    onFavoriteClick: (Book) -> Unit
+
+) {LazyVerticalGrid(
         columns = GridCells.Fixed(count = 2),
         contentPadding = PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -30,32 +37,16 @@ fun BookGrid(
         items(books) { book ->
             BookCard(
                 book = book,
+                isFavorite = favorites.any { it.id == book.id },
                 modifier = Modifier,
                 onClick = {
                     onBookClick(book)
                 },
-                onDoubleClick = {
-                    //später dafür da um das Buch zu drehen
+                onFavoriteClick = {
+                    onFavoriteClick(book)
                 }
             )
         }
     }
 }
 
-@Preview(showSystemUi = true)
-@Composable
-private fun BookGridPreview(){
-    val previewBooks = listOf(
-        Book("1", "Zora Neale", listOf("Hurston"), "https://covers.openlibrary.org/b/id/8231856-M.jpg", null, listOf("en"), false),
-        Book("2", "Der alte Mann", listOf("Hemingway"), "https://covers.openlibrary.org/b/id/8231856-M.jpg", null, listOf("de"), false),
-        Book("3", "1984", listOf("Orwell"), "https://covers.openlibrary.org/b/id/8231856-M.jpg", null, listOf("en"), false),
-        Book("4", "Moby Dick", listOf("Melville"), "https://covers.openlibrary.org/b/id/8231856-M.jpg", null, listOf("en"), false)
-    )
-
-    BuchBrowserTheme {
-        BookGrid(
-            books = previewBooks,
-            onBookClick = {}
-        )
-    }
-}
