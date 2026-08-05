@@ -16,13 +16,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.buchbrowser.viewmodels.FavoritesViewModel
 
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel(),
+    favoritesViewModel: FavoritesViewModel,
     onBookClick: (Book) -> Unit
 ) {
-
+    val favorites by favoritesViewModel.favorites.collectAsState()
     val books by homeViewModel.books.collectAsState()
     val searchQuery by homeViewModel.searchQuery.collectAsState()
     val errorMessage by homeViewModel.errorMessage.collectAsState()
@@ -59,8 +61,19 @@ fun HomeScreen(
         }
         if (books.isNotEmpty()) {
             BookGrid(
+
                 books = books,
-                onBookClick = onBookClick
+
+                favorites = favorites,
+
+                onBookClick = onBookClick,
+
+                onFavoriteClick = { book ->
+
+                    favoritesViewModel.toggleFavorite(book)
+
+                }
+
             )
         }
     }
