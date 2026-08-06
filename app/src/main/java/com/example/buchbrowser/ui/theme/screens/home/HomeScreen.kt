@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,14 +14,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,7 +37,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.buchbrowser.data.Book
@@ -46,7 +49,7 @@ import com.example.buchbrowser.viewmodels.HomeViewModel
 fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel(),
     favoritesViewModel: FavoritesViewModel,
-    onBookClick: (Book) -> Unit
+    onBookClick: (Book) -> Unit,
 ) {
     val favorites by favoritesViewModel.favorites.collectAsState()
     val books by homeViewModel.books.collectAsState()
@@ -62,17 +65,17 @@ fun HomeScreen(
         snapshotFlow {
             (gridState.firstVisibleItemIndex * 10_000) + gridState.firstVisibleItemScrollOffset
         }.collect { currentScrollPosition ->
-            if (currentScrollPosition > previousScrollPosition) {
-                isSearchVisible = false
-            } else if (currentScrollPosition < previousScrollPosition) {
-                isSearchVisible = true
-            }
+            isSearchVisible = currentScrollPosition <= previousScrollPosition
             previousScrollPosition = currentScrollPosition
         }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+        ) {
             AnimatedVisibility(
                 visible = isSearchVisible,
                 enter = slideInVertically(initialOffsetY = { -it / 2 }) + fadeIn(),
@@ -81,18 +84,15 @@ fun HomeScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        .padding(horizontal = 20.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     SearchBar(
                         query = searchQuery,
-                        onQueryChange = {
-                            homeViewModel.updateSearchQuery(it)
-                        },
-                        onSearch = {
-                            homeViewModel.searchBooks()
-                        },
-                        modifier = Modifier.weight(1f)
+                        onQueryChange = { homeViewModel.updateSearchQuery(it) },
+                        onSearch = { homeViewModel.searchBooks() },
+                        modifier = Modifier.weight(1f),
                     )
 
                     FilledTonalIconButton(
@@ -101,12 +101,12 @@ fun HomeScreen(
                             containerColor = if (isRandomMode) {
                                 MaterialTheme.colorScheme.primary
                             } else {
-                                MaterialTheme.colorScheme.surfaceVariant
+                                MaterialTheme.colorScheme.secondaryContainer
                             },
                             contentColor = if (isRandomMode) {
                                 MaterialTheme.colorScheme.onPrimary
                             } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
+                                MaterialTheme.colorScheme.onSecondaryContainer
                             },
                         ),
                     ) {
@@ -123,34 +123,70 @@ fun HomeScreen(
             }
 
             if (errorMessage != null) {
-
-                Text(
-                    text = errorMessage!!,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-
-                Button(
-                    onClick = {
-                        homeViewModel.loadOfflineBooks()
-                    },
-                    modifier = Modifier.padding(16.dp)
+                Surface(
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp, vertical = 8.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    color = MaterialTheme.colorScheme.errorContainer,
                 ) {
-                    Text("Offline-Bibliothek anzeigen")
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        Text(
+                            text = errorMessage!!,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Button(onClick = { homeViewModel.loadOfflineBooks() }) {
+                            Text("Offline-Bibliothek anzeigen")
+                        }
+                    }
                 }
             }
 
-            if (books.isNotEmpty()) {
-                BookGrid(
-                    books = books,
-                    favorites = favorites,
-                    gridState = gridState,
-                    modifier = Modifier.weight(1f),
-                    onBookClick = onBookClick,
-                    onFavoriteClick = { book ->
-                        favoritesViewModel.toggleFavorite(book)
+            when {
+                books.isNotEmpty() -> {
+                    BookGrid(
+                        books = books,
+                        favorites = favorites,
+                        gridState = gridState,
+                        modifier = Modifier.weight(1f),
+                        onBookClick = onBookClick,
+                        onFavoriteClick = { book ->
+                            favoritesViewModel.toggleFavorite(book)
+                        },
+                    )
+                }
+
+                !isLoading && errorMessage == null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.MenuBook,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                            )
+                            Text(
+                                text = "Search library",
+                                style = MaterialTheme.typography.headlineSmall,
+                            )
+                            Text(
+                                text = "Type title, author, or use random mode.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
-                )
+                }
             }
         }
 
@@ -159,7 +195,23 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
             ) {
-                CircularProgressIndicator()
+                Surface(
+                    shape = RoundedCornerShape(24.dp),
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                ) {
+                    Column(
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        CircularProgressIndicator()
+                        Text(
+                            text = "Loading shelves…",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
             }
         }
     }

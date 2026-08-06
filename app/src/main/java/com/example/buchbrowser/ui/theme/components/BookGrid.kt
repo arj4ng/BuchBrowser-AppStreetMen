@@ -1,40 +1,32 @@
 package com.example.buchbrowser.ui.theme.components
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.buchbrowser.data.Book
-import com.example.buchbrowser.ui.theme.BuchBrowserTheme
 
 @Composable
 fun BookGrid(
-
     books: List<Book>,
-
     favorites: List<Book>,
-
     gridState: LazyGridState,
-
     modifier: Modifier = Modifier,
-
     onBookClick: (Book) -> Unit,
-
-    onFavoriteClick: (Book) -> Unit
-
-) {LazyVerticalGrid(
+    onFavoriteClick: (Book) -> Unit,
+) {
+    LazyVerticalGrid(
         state = gridState,
         columns = GridCells.Fixed(count = 2),
-        contentPadding = PaddingValues(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement =  Arrangement.spacedBy(24.dp),
-        modifier = modifier
+        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        verticalArrangement = Arrangement.spacedBy(22.dp),
+        modifier = modifier,
     ) {
         items(books) { book ->
             BookCard(
@@ -46,7 +38,7 @@ fun BookGrid(
                 },
                 onFavoriteClick = {
                     onFavoriteClick(book)
-                }
+                },
             )
         }
     }

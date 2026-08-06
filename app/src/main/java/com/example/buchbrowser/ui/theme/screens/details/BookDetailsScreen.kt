@@ -10,8 +10,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -145,6 +148,7 @@ fun BookDetailsContent(
     onFavoriteClick: () -> Unit,
 ) {
     val book = uiState.book ?: return
+    val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
     Column(
         modifier = Modifier
@@ -152,7 +156,12 @@ fun BookDetailsContent(
             .background(MaterialTheme.colorScheme.background)
             .padding(innerPadding)
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp, vertical = 20.dp),
+            .padding(
+                start = 24.dp,
+                top = 20.dp,
+                end = 24.dp,
+                bottom = bottomInset + 124.dp,
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         BookHeroCover(
@@ -166,6 +175,7 @@ fun BookDetailsContent(
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Start,
         )
 
@@ -259,6 +269,7 @@ fun BookDetailsContent(
                     text = "Beschreibung",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
                 when {
@@ -267,6 +278,7 @@ fun BookDetailsContent(
                         Text(
                             text = "Beschreibung lädt gerade nach.",
                             style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
 
@@ -283,6 +295,7 @@ fun BookDetailsContent(
                             text = uiState.description,
                             style = MaterialTheme.typography.bodyLarge,
                             lineHeight = MaterialTheme.typography.bodyLarge.lineHeight,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
 
@@ -290,6 +303,7 @@ fun BookDetailsContent(
                         Text(
                             text = "Zu diesem Buch gibt es gerade noch keine Beschreibung.",
                             style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -350,6 +364,7 @@ private fun DetailsMetaBlock(
         Text(
             text = "Erscheinungsjahr: ${publishYear ?: "Unbekannt"}",
             style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onBackground,
         )
     }
 }
