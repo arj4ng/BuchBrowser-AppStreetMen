@@ -54,10 +54,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.buchbrowser.music.MusicManager
 import com.example.buchbrowser.viewmodels.HomeViewModel
 import com.example.buchbrowser.ui.theme.components.SearchBar
 import com.example.buchbrowser.viewmodels.ReadingListViewModel
 import com.example.buchbrowser.viewmodels.FavoritesViewModel
+import com.example.buchbrowser.viewmodels.MusicViewModel
 
 // app/src/main/java/com/example/buchbrowser/AppStart.kt
 // AppStart
@@ -92,7 +94,20 @@ fun AppStart() {
     val searchQuery by homeViewModel.searchQuery.collectAsState()
     var isSearchActive by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+// MUSIK
+    val musicViewModel = remember { MusicViewModel() }
 
+    LaunchedEffect(musicViewModel.selectedTheme) {
+
+        MusicManager.playTheme(
+
+            context,
+
+            musicViewModel.selectedTheme
+
+        )
+
+    }
     val repository = remember {
         BookRepositoryImpl(
             api = ApiClient.openLibraryApi,
@@ -250,7 +265,9 @@ fun AppStart() {
                 )
             }
             composable<Route.Settings> {
-                SettingsScreen()
+                SettingsScreen(
+                    musicViewModel = musicViewModel
+                )
             }
             composable<Route.Details> { entry ->
                 val route = entry.toRoute<Route.Details>()
@@ -305,6 +322,7 @@ fun AppStart() {
             }
 
         }
+
     }
 }
 
