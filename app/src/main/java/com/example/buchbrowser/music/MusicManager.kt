@@ -52,6 +52,20 @@ object MusicManager {
         currentTheme = theme
     }
 
+    fun playSound(context: Context, sound: Int) {
+
+        val player = MediaPlayer.create(context, sound)
+
+        player.setOnCompletionListener {
+
+            it.release()
+
+        }
+
+        player.start()
+
+    }
+
     fun pause() {
         mediaPlayer?.pause()
     }
