@@ -36,12 +36,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.buchbrowser.data.Book
+import com.example.buchbrowser.data.getOpenSound
+import com.example.buchbrowser.music.MusicManager
 import com.example.buchbrowser.ui.theme.BuchBrowserTheme
 import com.example.buchbrowser.viewmodels.BookDetailsUiState
 import com.example.buchbrowser.viewmodels.BookDetailsViewModel
@@ -100,6 +103,19 @@ fun BookDetailsScreen(
     // Merkliste beobachten -> Bookmark-Zustand aktualisiert sich sofort beim Tippen
     val readingList by readingListViewModel.books.collectAsState()
     val isBookmarked = currentBook != null && readingList.any { it.id == currentBook.id }
+    // Soundeffects
+    val context = LocalContext.current
+    LaunchedEffect(book.id) {
+
+        viewModel.setBook(book)
+
+        book.getOpenSound()?.let {
+
+            MusicManager.playSound(context, it)
+
+        }
+
+    }
 
     BookDetailsContent(
         uiState = viewModel.uiState,
