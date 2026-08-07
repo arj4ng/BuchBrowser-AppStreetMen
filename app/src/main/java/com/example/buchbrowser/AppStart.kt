@@ -85,7 +85,19 @@ fun AppStart() {
     val context = LocalContext.current
     val navController = rememberNavController()
     val settingsViewModel: SettingsViewModel = viewModel()
-    val homeViewModel: HomeViewModel = viewModel()
+    
+    val repository = remember {
+        BookRepositoryImpl(
+            api = ApiClient.openLibraryApi,
+            bookDao = BookDatabase.getInstance(context).bookDao(),
+        )
+    }
+    
+    val homeViewModel: HomeViewModel = remember { HomeViewModel(repository = repository) }
+    val detailsViewModel = remember { BookDetailsViewModel(repository = repository) }
+    val readingListViewModel = remember { ReadingListViewModel(repository = repository) }
+    val favoritesViewModel = remember { FavoritesViewModel(repository = repository) }
+    
     val appThemeMode by settingsViewModel.appThemeMode.collectAsState()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
@@ -93,15 +105,6 @@ fun AppStart() {
     val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
     val musicViewModel = remember { MusicViewModel() }
-    val repository = remember {
-        BookRepositoryImpl(
-            api = ApiClient.openLibraryApi,
-            bookDao = BookDatabase.getInstance(context).bookDao(),
-        )
-    }
-    val detailsViewModel = remember { BookDetailsViewModel(repository = repository) }
-    val readingListViewModel = remember { ReadingListViewModel() }
-    val favoritesViewModel = remember { FavoritesViewModel() }
 
     LaunchedEffect(musicViewModel.selectedTheme) {
         MusicManager.playTheme(context, musicViewModel.selectedTheme)
@@ -183,6 +186,7 @@ fun AppStart() {
                     HomeScreen(
                         homeViewModel = homeViewModel,
                         favoritesViewModel = favoritesViewModel,
+                        readingListViewModel = readingListViewModel,
                         onBookClick = { book ->
                             navController.navigate(
                                 Route.Details(
@@ -200,6 +204,7 @@ fun AppStart() {
                 composable<Route.Favorite> {
                     FavoriteScreen(
                         favoritesViewModel = favoritesViewModel,
+                        readingListViewModel = readingListViewModel,
                         onBookClick = { book ->
                             navController.navigate(
                                 Route.Details(

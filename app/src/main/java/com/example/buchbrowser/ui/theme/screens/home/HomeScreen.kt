@@ -44,14 +44,17 @@ import com.example.buchbrowser.ui.theme.components.BookGrid
 import com.example.buchbrowser.ui.theme.components.SearchBar
 import com.example.buchbrowser.viewmodels.FavoritesViewModel
 import com.example.buchbrowser.viewmodels.HomeViewModel
+import com.example.buchbrowser.viewmodels.ReadingListViewModel
 
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel(),
     favoritesViewModel: FavoritesViewModel,
+    readingListViewModel: ReadingListViewModel,
     onBookClick: (Book) -> Unit,
 ) {
     val favorites by favoritesViewModel.favorites.collectAsState()
+    val readingList by readingListViewModel.books.collectAsState()
     val books by homeViewModel.books.collectAsState()
     val searchQuery by homeViewModel.searchQuery.collectAsState()
     val errorMessage by homeViewModel.errorMessage.collectAsState()
@@ -151,12 +154,16 @@ fun HomeScreen(
                     BookGrid(
                         books = books,
                         favorites = favorites,
+                        readingList = readingList,
                         gridState = gridState,
                         modifier = Modifier.weight(1f),
                         onBookClick = onBookClick,
                         onFavoriteClick = { book ->
                             favoritesViewModel.toggleFavorite(book)
                         },
+                        onBookmarkClick = { book ->
+                            readingListViewModel.toggleBookmark(book)
+                        }
                     )
                 }
 

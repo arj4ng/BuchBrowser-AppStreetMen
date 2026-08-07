@@ -1,44 +1,32 @@
 package com.example.buchbrowser.repository
 
 import com.example.buchbrowser.data.Book
+import kotlinx.coroutines.flow.Flow
 
 // app/src/main/java/com/example/buchbrowser/repository/BookRepository.kt
 // BookRepository
 //
 // Created by Arjang Khademi on 03.08.2026
-/*
-  ╔════════════════════════════════════════════════════════╗
-  ║  █████╗ ██████╗      ██╗ ██╗  ██╗ ███╗   ██╗  ██████╗  ║
-  ║ ██╔══██╗██╔══██╗     ██║ ██║  ██║ ████╗  ██║ ██╔════╝  ║
-  ║ ███████║██████╔╝     ██║ ███████║ ██╔██╗ ██║ ██║  ███╗ ║
-  ║ ██╔══██║██╔══██╗██   ██║ ╚════██║ ██║╚██╗██║ ██║   ██║ ║
-  ║ ██║  ██║██║  ██║╚█████╔╝      ██║ ██║ ╚████║ ╚██████╔╝ ║
-  ║ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚════╝       ╚═╝ ╚═╝  ╚═══╝  ╚═════╝  ║
-  ╚═════════════════════════════════════════ [ DEV TAG ] ══╝
-*/
 
-// TODO: ╔══ [ BuchBrowser ] ══╗
-// TODO: ║  BookRepository.kt  ║
-// TODO: ╚═════════════════════╝
-
-// TODO: ┏━ PROJEKTWOCHE | REPOSITORY
-// TODO: ┗━ Gemeinsame Datenschnittstelle
-
-// gemeinsame Stelle für alle Buchdaten
 interface BookRepository {
 
-    // gibt Suchtreffer zurück, egal ob API oder Mock
     suspend fun searchBooks(query: String): List<Book>
 
-    // holt ein zufälliges Buch aus der aktuellen Quelle
     suspend fun getRandomBook(): Book?
 
-    // holt alle lokal gemerkten Bücher
+    fun getSeenBooksFlow(): Flow<List<Book>>
+
     suspend fun getSeenBooks(): List<Book>
 
-    // merkt ein Buch lokal als gesehen
     suspend fun markBookAsSeen(book: Book)
 
-    // holt die Beschreibung für ein Buch nach
     suspend fun getBookDescription(bookId: String): String?
+
+    fun getFavoriteBooks(): Flow<List<Book>>
+
+    fun getReadingListBooks(): Flow<List<Book>>
+
+    suspend fun toggleFavorite(book: Book)
+
+    suspend fun toggleReadingList(book: Book)
 }

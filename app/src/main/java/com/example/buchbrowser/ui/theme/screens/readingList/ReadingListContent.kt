@@ -25,6 +25,7 @@ fun ReadingListContent(
     isLoading: Boolean,
     onBookClick: (Book) -> Unit,
     onFavoriteClick: (Book) -> Unit,
+    onBookmarkClick: (Book) -> Unit,
 ) {
     val gridState = rememberLazyGridState()
 
@@ -58,9 +59,11 @@ fun ReadingListContent(
             BookGrid(
                 books = books,
                 favorites = favorites,
+                readingList = books,
                 gridState = gridState,
                 onBookClick = onBookClick,
                 onFavoriteClick = onFavoriteClick,
+                onBookmarkClick = onBookmarkClick
             )
         }
     }

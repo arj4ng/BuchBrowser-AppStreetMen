@@ -36,6 +36,8 @@ data class BookEntity(
     val coverUrl: String?,
     val firstPublishYear: Int?,
     val languageCodesText: String,
+    val isFavorite: Boolean = false,
+    val isInReadingList: Boolean = false,
 )
 
 // macht aus Roomdaten wieder ein normales Buch
@@ -48,6 +50,8 @@ fun BookEntity.toBook(): Book {
         firstPublishYear = firstPublishYear,
         languageCodes = languageCodesText.decodeList(),
         isSeen = true,
+        isFavorite = isFavorite,
+        isInReadingList = isInReadingList,
     )
 }
 
@@ -60,6 +64,8 @@ fun Book.toEntity(): BookEntity {
         coverUrl = coverUrl,
         firstPublishYear = firstPublishYear,
         languageCodesText = languageCodes.encodeList(),
+        isFavorite = isFavorite,
+        isInReadingList = isInReadingList,
     )
 }
 

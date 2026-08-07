@@ -15,10 +15,12 @@ import com.example.buchbrowser.data.Book
 fun BookGrid(
     books: List<Book>,
     favorites: List<Book>,
+    readingList: List<Book> = emptyList(),
     gridState: LazyGridState,
     modifier: Modifier = Modifier,
     onBookClick: (Book) -> Unit,
     onFavoriteClick: (Book) -> Unit,
+    onBookmarkClick: (Book) -> Unit = {},
 ) {
     LazyVerticalGrid(
         state = gridState,
@@ -32,6 +34,7 @@ fun BookGrid(
             BookCard(
                 book = book,
                 isFavorite = favorites.any { it.id == book.id },
+                isBookmarked = readingList.any { it.id == book.id },
                 modifier = Modifier,
                 onClick = {
                     onBookClick(book)
@@ -39,6 +42,9 @@ fun BookGrid(
                 onFavoriteClick = {
                     onFavoriteClick(book)
                 },
+                onBookmarkClick = {
+                    onBookmarkClick(book)
+                }
             )
         }
     }

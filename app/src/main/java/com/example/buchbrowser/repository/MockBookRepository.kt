@@ -1,37 +1,15 @@
 package com.example.buchbrowser.repository
 
 import com.example.buchbrowser.data.Book
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlin.random.Random
 
-// app/src/main/java/com/example/buchbrowser/repository/MockBookRepository.kt
-// MockBookRepository
-//
-// Created by Arjang Khademi on 03.08.2026
-/*
-  ╔════════════════════════════════════════════════════════╗
-  ║  █████╗ ██████╗      ██╗ ██╗  ██╗ ███╗   ██╗  ██████╗  ║
-  ║ ██╔══██╗██╔══██╗     ██║ ██║  ██║ ████╗  ██║ ██╔════╝  ║
-  ║ ███████║██████╔╝     ██║ ███████║ ██╔██╗ ██║ ██║  ███╗ ║
-  ║ ██╔══██║██╔══██╗██   ██║ ╚════██║ ██║╚██╗██║ ██║   ██║ ║
-  ║ ██║  ██║██║  ██║╚█████╔╝      ██║ ██║ ╚████║ ╚██████╔╝ ║
-  ║ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚════╝       ╚═╝ ╚═╝  ╚═══╝  ╚═════╝  ║
-  ╚═════════════════════════════════════════ [ DEV TAG ] ══╝
-*/
-
-// TODO: ╔══ [ BuchBrowser ] ══╗
-// TODO: ║ MockBookRepository  ║
-// TODO: ╚═════════════════════╝
-
-// TODO: ┏━ PROJEKTWOCHE | MOCKDATEN
-// TODO: ┗━ Beispieldaten für Team
-
-// liefert feste Beispieldaten für Tests und UI
 class MockBookRepository(
-    // auch hier bleibt Zufall austauschbar für spätere Tests
     private val random: Random = Random.Default,
 ) : BookRepository {
 
-    // kleine feste Liste, damit Team und UI ohne echte API schon loslegen können
     private val sampleBooks = listOf(
         Book(
             id = "/works/OL45883W",
@@ -62,60 +40,101 @@ class MockBookRepository(
         ),
     )
 
-    // merkt sich nur IDs, für gesehen reicht das schon
     private val seenBookIds = linkedSetOf<String>()
+    private val favoriteBookIds = linkedSetOf<String>()
+    private val readingListBookIds = linkedSetOf<String>()
 
-    // sucht nur in den Mockdaten, fühlt sich nach außen aber wie das echte Repo an
     override suspend fun searchBooks(query: String): List<Book> {
-
         val normalizedQuery = query.trim().lowercase()
-
-        if (normalizedQuery.isBlank()) {
-            return sampleBooks.map { book ->
-                book.copy(isSeen = seenBookIds.contains(book.id))
+        val filtered = if (normalizedQuery.isBlank()) {
+            sampleBooks
+        } else {
+            sampleBooks.filter { book ->
+                book.title.lowercase().contains(normalizedQuery) ||
+                        book.authorNames.any { author ->
+                            author.lowercase().contains(normalizedQuery)
+                        }
             }
         }
-
-        return sampleBooks.filter { book ->
-            book.title.lowercase().contains(normalizedQuery) ||
-                    book.authorNames.any { author ->
-                        author.lowercase().contains(normalizedQuery)
-                    }
-        }.map { book ->
-            book.copy(isSeen = seenBookIds.contains(book.id))
+        return filtered.map { book ->
+            book.copy(
+                isSeen = seenBookIds.contains(book.id),
+                isFavorite = favoriteBookIds.contains(book.id),
+                isInReadingList = readingListBookIds.contains(book.id)
+            )
         }
     }
 
     override suspend fun getRandomBook(): Book? {
-        if (sampleBooks.isEmpty()) {
-            return null
-        }
-
+        if (sampleBooks.isEmpty()) return null
         val randomBook = sampleBooks[random.nextInt(sampleBooks.size)]
+        return randomBook.copy(
+            isSeen = seenBookIds.contains(randomBook.id),
+            isFavorite = favoriteBookIds.contains(randomBook.id),
+            isInReadingList = readingListBookIds.contains(randomBook.id)
+        )
+    }
 
-        return randomBook.copy(isSeen = seenBookIds.contains(randomBook.id))
+    override fun getSeenBooksFlow(): Flow<List<Book>> {
+        return flowOf(sampleBooks.filter { seenBookIds.contains(it.id) }.map {
+            it.copy(
+                isSeen = true,
+                isFavorite = favoriteBookIds.contains(it.id),
+                isInReadingList = readingListBookIds.contains(it.id)
+            )
+        })
     }
 
     override suspend fun getSeenBooks(): List<Book> {
-        // gibt nur Bücher zurück, deren ID vorher gemerkt wurde
-        return sampleBooks.filter { book ->
-            seenBookIds.contains(book.id)
-        }.map { book ->
-            book.copy(isSeen = true)
+        return sampleBooks.filter { seenBookIds.contains(it.id) }.map {
+            it.copy(
+                isSeen = true,
+                isFavorite = favoriteBookIds.contains(it.id),
+                isInReadingList = readingListBookIds.contains(it.id)
+            )
         }
     }
 
     override suspend fun markBookAsSeen(book: Book) {
-        // set blockt doppelte Einträge von selbst
         seenBookIds.add(book.id)
     }
 
     override suspend fun getBookDescription(bookId: String): String? {
         return when (bookId) {
-            "/works/OL45883W" -> "Bilbo stolpert eher zufällig in ein großes Abenteuer und wächst mit jedem Schritt über sich hinaus."
-            "/works/OL27448W" -> "Elizabeth Bennet gerät zwischen Stolz, Vorurteile und sehr feine gesellschaftliche Spitzen."
-            "/works/OL82563W" -> "Momo hört zu wie kaum jemand sonst und stellt sich einer Welt entgegen, die Zeit nur noch sparen will."
+            "/works/OL45883W" -> "Bilbo stolpert eher zufällig in ein großes Abenteuer..."
+            "/works/OL27448W" -> "Elizabeth Bennet gerät zwischen Stolz, Vorurteile..."
+            "/works/OL82563W" -> "Momo hört zu wie kaum jemand sonst..."
             else -> null
+        }
+    }
+
+    override fun getFavoriteBooks(): Flow<List<Book>> {
+        return flowOf(sampleBooks.filter { favoriteBookIds.contains(it.id) }.map {
+            it.copy(isFavorite = true, isSeen = seenBookIds.contains(it.id), isInReadingList = readingListBookIds.contains(it.id))
+        })
+    }
+
+    override fun getReadingListBooks(): Flow<List<Book>> {
+        return flowOf(sampleBooks.filter { readingListBookIds.contains(it.id) }.map {
+            it.copy(isInReadingList = true, isSeen = seenBookIds.contains(it.id), isFavorite = favoriteBookIds.contains(it.id))
+        })
+    }
+
+    override suspend fun toggleFavorite(book: Book) {
+        if (favoriteBookIds.contains(book.id)) {
+            favoriteBookIds.remove(book.id)
+        } else {
+            favoriteBookIds.add(book.id)
+            seenBookIds.add(book.id)
+        }
+    }
+
+    override suspend fun toggleReadingList(book: Book) {
+        if (readingListBookIds.contains(book.id)) {
+            readingListBookIds.remove(book.id)
+        } else {
+            readingListBookIds.add(book.id)
+            seenBookIds.add(book.id)
         }
     }
 }
