@@ -31,4 +31,6 @@ data class Book(
     val firstPublishYear: Int?,
     val languageCodes: List<String>,
     val isSeen: Boolean,
+    val isFavorite: Boolean = false,
+    val isInReadingList: Boolean = false,
 )
