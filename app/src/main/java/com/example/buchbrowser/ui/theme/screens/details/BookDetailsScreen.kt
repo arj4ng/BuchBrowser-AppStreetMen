@@ -169,6 +169,7 @@ fun BookDetailsContent(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(28.dp),
             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+            contentColor = MaterialTheme.colorScheme.onSurface,
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(20.dp),
@@ -178,6 +179,7 @@ fun BookDetailsContent(
                     text = "Beschreibung",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
                 if (uiState.isDescriptionLoading) {
@@ -186,6 +188,7 @@ fun BookDetailsContent(
                     Text(
                         text = uiState.description ?: "Keine Beschreibung verfügbar.",
                         style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
@@ -217,7 +220,10 @@ private fun BookHeroCover(
                 modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(text = "Kein\nCover")
+                Text(
+                    text = "Kein\nCover",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
 

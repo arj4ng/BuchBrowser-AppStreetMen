@@ -14,7 +14,9 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,6 +41,19 @@ fun SettingsScreen(
     var expanded by remember { mutableStateOf(false) }
     var themeExpanded by remember { mutableStateOf(false) }
     val appThemeMode by settingsViewModel.appThemeMode.collectAsState()
+    val dropdownFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = MaterialTheme.colorScheme.surface,
+        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+        focusedLabelColor = MaterialTheme.colorScheme.primary,
+        unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        focusedBorderColor = MaterialTheme.colorScheme.primary,
+        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+        focusedTrailingIconColor = MaterialTheme.colorScheme.primary,
+        unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        cursorColor = MaterialTheme.colorScheme.primary,
+    )
 
     Column(
         modifier = Modifier
@@ -82,11 +97,13 @@ fun SettingsScreen(
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(themeExpanded)
                         },
+                        colors = dropdownFieldColors,
                     )
 
                     DropdownMenu(
                         expanded = themeExpanded,
                         onDismissRequest = { themeExpanded = false },
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                     ) {
                         AppThemeMode.entries.forEach { mode ->
                             DropdownMenuItem(
@@ -95,6 +112,9 @@ fun SettingsScreen(
                                     settingsViewModel.setAppThemeMode(mode)
                                     themeExpanded = false
                                 },
+                                colors = MenuDefaults.itemColors(
+                                    textColor = MaterialTheme.colorScheme.onSurface,
+                                ),
                             )
                         }
                     }
@@ -132,11 +152,13 @@ fun SettingsScreen(
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded)
                         },
+                        colors = dropdownFieldColors,
                     )
 
                     DropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                     ) {
                         MusicTheme.entries.forEach { theme ->
                             DropdownMenuItem(
@@ -145,6 +167,9 @@ fun SettingsScreen(
                                     musicViewModel.selectTheme(theme)
                                     expanded = false
                                 },
+                                colors = MenuDefaults.itemColors(
+                                    textColor = MaterialTheme.colorScheme.onSurface,
+                                ),
                             )
                         }
                     }

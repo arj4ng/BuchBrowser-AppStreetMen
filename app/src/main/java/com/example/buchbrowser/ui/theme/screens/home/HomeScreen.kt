@@ -143,7 +143,10 @@ fun HomeScreen(
                             style = MaterialTheme.typography.bodyMedium,
                         )
                         Button(onClick = { homeViewModel.loadOfflineBooks() }) {
-                            Text("Offline-Bibliothek anzeigen")
+                            Text(
+                                text = "Offline-Bibliothek anzeigen",
+                                color = MaterialTheme.colorScheme.onPrimary,
+                            )
                         }
                     }
                 }
@@ -185,6 +188,7 @@ fun HomeScreen(
                             Text(
                                 text = "Search library",
                                 style = MaterialTheme.typography.headlineSmall,
+                                color = MaterialTheme.colorScheme.onBackground,
                             )
                             Text(
                                 text = "Type title, author, or use random mode.",

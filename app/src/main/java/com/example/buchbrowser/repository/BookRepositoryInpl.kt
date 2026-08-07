@@ -17,6 +17,15 @@ class BookRepositoryImpl(
     private val bookDao: BookDao,
     private val random: Random = Random.Default,
 ) : BookRepository {
+    private val randomQueries = listOf(
+        "bestseller",
+        "fantasy",
+        "science fiction",
+        "mystery",
+        "romance",
+        "history",
+        "biography",
+    )
 
     override suspend fun searchBooks(query: String): List<Book> {
         val normalizedQuery = query.trim()
@@ -43,11 +52,35 @@ class BookRepositoryImpl(
     }
 
     override suspend fun getRandomBook(): Book? {
-        val seenBooks = getSeenBooks()
-        if (seenBooks.isEmpty()) {
-            return null
+        val localBooks = bookDao.getSeenBooks().associateBy { it.id }
+
+        randomQueries.shuffled(random).forEach { query ->
+            val randomBook = api.searchBooks(query = query).docs
+                .mapNotNull { bookDto ->
+                    val bookId = bookDto.key.orEmpty()
+                    val title = bookDto.title.orEmpty()
+
+                    if (bookId.isBlank() || title.isBlank()) {
+                        null
+                    } else {
+                        val local = localBooks[bookId]
+                        bookDto.toBook(isSeen = local != null).copy(
+                            isFavorite = local?.isFavorite ?: false,
+                            isInReadingList = local?.isInReadingList ?: false,
+                        )
+                    }
+                }
+                .filter { book -> book.title.isNotBlank() && book.id.isNotBlank() }
+                .distinctBy { book -> book.id }
+                .takeIf { it.isNotEmpty() }
+                ?.let { books -> books[random.nextInt(books.size)] }
+
+            if (randomBook != null) {
+                return randomBook
+            }
         }
-        return seenBooks[random.nextInt(seenBooks.size)]
+
+        return null
     }
 
     override fun getSeenBooksFlow(): Flow<List<Book>> {
